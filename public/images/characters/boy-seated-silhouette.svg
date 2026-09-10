@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 700" role="img" aria-label="Seated boy silhouette placeholder">
+  <g fill="#020303">
+    <ellipse cx="265" cy="126" rx="43" ry="51" transform="rotate(8 265 126)"/>
+    <path d="M224 115c6-37 31-58 59-48 17 6 29 23 31 43-15-13-29-18-46-18-18 0-31 8-44 23Z"/>
+    <path d="M244 169h43l7 50-55 2Z"/>
+    <path d="M218 203c27-16 66-13 89 4 28 21 36 76 27 153l-8 79H187l-3-87c-2-65 8-126 34-149Z"/>
+    <path d="M186 424h141l23 116-73 9-24-86-8 86-77-4Z"/>
+  </g>
+  <g fill="none" stroke="#020303" stroke-linecap="round">
+    <path d="M216 239c-26 31-32 70-17 102 13 26 45 38 84 38" stroke-width="35"/>
+    <path d="M306 235c25 21 35 49 30 78-4 24-21 44-52 66" stroke-width="34"/>
+  </g>
+  <path fill="#020303" d="M166 420h203v35H166zM160 453h28v161h-28zM343 453h27v161h-27z"/>
+</svg>

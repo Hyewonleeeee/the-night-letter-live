@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 560" role="img" aria-label="Aged open envelope placeholder">
+  <defs>
+    <linearGradient id="paper2" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#d0c9b3"/><stop offset=".58" stop-color="#aca58f"/><stop offset="1" stop-color="#777163"/>
+    </linearGradient>
+    <filter id="rough"><feTurbulence baseFrequency=".35" numOctaves="3" seed="8" result="n"/><feBlend in="SourceGraphic" in2="n" mode="soft-light"/></filter>
+  </defs>
+  <path d="M45 185 671 158l19 361-635 25Z" fill="url(#paper2)" filter="url(#rough)"/>
+  <path d="M47 190 347 4l324 154-308 235Z" fill="#8d8776"/>
+  <path d="M77 207 652 181l-272 239Z" fill="#cec6ae" opacity=".86"/>
+  <path d="m61 528 240-214M687 506 420 309" fill="none" stroke="#504d44" stroke-opacity=".52" stroke-width="4"/>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 900" role="img" aria-label="Aged letter paper placeholder">
+  <defs>
+    <linearGradient id="sheet" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#d7d0b9"/><stop offset=".5" stop-color="#bbb39d"/><stop offset="1" stop-color="#908978"/>
+    </linearGradient>
+    <filter id="paperNoise">
+      <feTurbulence baseFrequency=".2" numOctaves="4" seed="31" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="3"/>
+      <feBlend in="SourceGraphic" in2="noise" mode="soft-light"/>
+    </filter>
+  </defs>
+  <path d="M51 22 681 41l-18 826-618 12Z" fill="url(#sheet)" filter="url(#paperNoise)"/>
+  <path d="M70 53c173 10 380-8 585 15M73 842c185-10 368 8 565-5" fill="none" stroke="#716b5e" stroke-opacity=".16" stroke-width="3"/>
+</svg>
