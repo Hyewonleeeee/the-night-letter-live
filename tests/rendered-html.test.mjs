@@ -97,7 +97,7 @@ test("keeps Scene 3 bounded to The First Sign and ships its replaceable assets",
   assert.match(config, /export const SCENE_3_TIMING/);
   assert.match(config, /start:\s*SCENE_2_TIMING\.end/);
   assert.match(config, /end:\s*292/);
-  assert.match(config, /label:\s*"The First Sign"/);
+  assert.match(config, /text:\s*"THE FIRST SIGN"/);
   assert.doesNotMatch(config, /first-sign-(voldemort|black-shape|spell)/i);
 
   await Promise.all([
@@ -115,5 +115,40 @@ test("keeps Scene 3 bounded to The First Sign and ships its replaceable assets",
     "scene-3-wildflower.png",
   ].map((filename) => access(
     new URL(`../public/images/props/${filename}`, import.meta.url),
+  )));
+});
+
+test("builds the complete 14-minute animatic as five operator chapters", async () => {
+  const config = await readFile(
+    new URL("../app/config/playerConfig.ts", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(config, /export const LATER_STORY_TIMING/);
+  assert.match(config, /end:\s*840/);
+  assert.match(config, /durationSeconds:\s*LATER_STORY_TIMING\.end/);
+  assert.match(config, /export const FIVE_CHAPTER_MARKERS/);
+  for (const start of [0, 168, 336, 504, 672]) {
+    assert.match(config, new RegExp(`timeSeconds:\\s*${start}\\b`));
+  }
+  assert.match(config, /III · THE SHADOW/);
+  assert.match(config, /IV · THE PRICE/);
+  assert.match(config, /V · THE RETURN/);
+  assert.match(config, /Bring me the cat\./);
+  assert.match(config, /You don't lead me\./);
+});
+
+test("ships every replaceable plate used by the five-chapter continuation", async () => {
+  await Promise.all([
+    "chapter-3-mirror-normal.png",
+    "chapter-3-mirror-shadow.png",
+    "chapter-3-bedroom-shadow.png",
+    "chapter-3-school-shadow.png",
+    "chapter-4-road-car-grounded.png",
+    "chapter-4-road-car-lifted.png",
+    "chapter-4-refusal.png",
+    "chapter-5-void-resistance.png",
+  ].map((filename) => access(
+    new URL(`../public/images/backgrounds/${filename}`, import.meta.url),
   )));
 });

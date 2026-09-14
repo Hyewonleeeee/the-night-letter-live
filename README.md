@@ -1,10 +1,10 @@
 # The Night Letter — Cinematic Web Player
 
-30분 공연용 영상을 브라우저에서 재생하기 위한 단일 페이지 플레이어입니다. 현재는 전체 공연이 아니라, 웰링턴 외곽 주택에서 의문의 편지를 발견하고 할로윈 의식을 시작한 뒤 처음으로 설명할 수 없는 힘을 경험하는 **292초 레이어 애니매틱**을 구현합니다.
+15분 공연을 염두에 둔 브라우저 기반 시네마틱 플레이어입니다. 현재 편집본은 웰링턴의 편지와 흰 천 의식에서 시작해, 소년의 능력·그림자의 명령·꿈에서 깨어난 뒤 되돌아온 편지까지 이어지는 **14분(840초) 레이어 애니매틱**입니다.
 
-이번 버전은 `03:22`부터 시작하는 **Scene 3 — “The First Sign”**까지만 추가합니다. 평범하고 따뜻한 아침에서 시작해 문고리 파손, 작은 돌과 꽃의 미세한 반응을 거쳐 `04:52` 소년의 불안한 얼굴에서 끝납니다. 볼드모트, 검은 형상, 주문 발동 또는 그 이후 장면은 Scene 3에 포함하지 않았습니다.
+전체는 공연자가 숫자키 `1`–`5`로 다룰 수 있는 다섯 챕터로 나뉘며, 각 챕터 길이는 `02:48`입니다. 영화 안의 세부 컷은 절대 시간 기반 서브 큐이므로 재생바를 임의 위치로 옮겨도 카메라, 디졸브, 자막, 오디오 슬롯이 같은 상태로 복원됩니다.
 
-현재 버전에는 전체 `00:00–04:52` 구간의 Visual Quality Pass가 적용되어 있습니다. 타임라인·대사·장면 순서·플레이어 기능은 바꾸지 않고, 인물과 손이 중요한 숏은 배경과 같은 원근·광원·접촉 그림자를 가진 실사형 연속 프레임으로 교체했습니다.
+`00:00–04:52`의 기존 편집, 특히 `00:52`부터 실제 편지 위를 이동하며 한 줄씩 읽는 연출은 그대로 보존했습니다. 후반부는 얼굴이나 보행을 코드로 억지로 애니메이션하지 않고, 같은 인물·렌즈·조명의 실사형 16:9 플레이트에 느린 카메라와 절제된 빛/그림자 처리를 더합니다. 고양이는 목걸이와 소리로만 암시하며 위해 장면은 없습니다.
 
 기존의 `/stage`, `/control`, 복잡한 Cue 입력 창은 사용하지 않습니다. 공연용 공개 화면은 왼쪽 영상과 오른쪽 실시간 코드 편집기를 결합한 하나의 분할 화면입니다. `/player`는 이 화면의 왼쪽 영상을 재생하기 위한 내부 경로로 유지합니다.
 
@@ -18,11 +18,25 @@ npm run dev
 
 브라우저에서 `http://localhost:3000`을 엽니다. 루트 주소에서 왼쪽 영상과 오른쪽 코딩 화면이 함께 있는 공연용 분할 화면이 바로 표시됩니다.
 
+## GitHub Pages 공유
+
+친구에게 공유하는 GitHub Pages 빌드는 공연용 `/player` 화면만 첫 화면에
+표시합니다. 로컬 Next/vinext 앱과 Pages 정적 빌드는 서로 분리되어 있습니다.
+
+```bash
+npm run build:pages
+```
+
+`main` 브랜치에 변경이 올라오면 GitHub Actions가 자동으로 정적 플레이어를
+빌드하고 `https://hyewonleeeee.github.io/the-night-letter-live/`에 배포합니다.
+저장소의 **Settings → Pages → Build and deployment**에서 Source를
+**GitHub Actions**로 한 번 선택하면 이후 푸시부터 자동 갱신됩니다.
+
 ## 실시간 라이브 코딩 데스크
 
 루트 주소 `http://localhost:3000`과 `http://localhost:3000/live`는 동일한 공연용 단일 분할 화면을 표시합니다.
 
-- 왼쪽: 기존 292초 시네마틱 플레이어
+- 왼쪽: 14분 / 5챕터 시네마틱 플레이어
 - 오른쪽: 공연자가 실제로 타이핑하는 코드 편집기
 - `Cmd/Ctrl + Enter`: 현재 줄 또는 선택한 코드만 즉시 실행
 - `Cmd/Ctrl + Shift + Enter`: 편집기 전체 실행
@@ -58,10 +72,20 @@ reset(1.8);
 - 재생 중 컨트롤 자동 숨김
 - `Space`: 재생 / 일시정지
 - `←`, `→`: 5초 뒤로 / 앞으로
-- 숫자 `1`–`9`, `0`: 주요 장면 바로가기
+- 숫자 `1`–`5`: 다섯 챕터 바로가기
 - 더블클릭: 전체 화면, `Escape`: 전체 화면 해제
 
-## 292초 타임라인
+## 14분 / 5챕터 타임라인
+
+공연자용 챕터 시작점은 다음과 같습니다.
+
+- `1` — `00:00` **I · THE INVITATION**
+- `2` — `02:48` **II · THE FIRST SIGN**
+- `3` — `05:36` **III · THE SHADOW**
+- `4` — `08:24` **IV · THE PRICE**
+- `5` — `11:12` **V · THE RETURN**
+
+기존 구간:
 
 - `00:00` 웰링턴 외곽 주택과 젖은 도로
 - `00:12` 빗물 맺힌 창문과 소년 실루엣
@@ -96,6 +120,31 @@ reset(1.8);
 - `04:30` 주변 바람 없이 한 줄기의 꽃만 천천히 기울어짐
 - `04:40.5` 꽃이 원래 자세로 돌아옴
 - `04:43–04:52` 자신의 손을 내려다보는 소년의 불안한 얼굴에서 종료
+
+새 후반부:
+
+- `04:52–05:18` 평범한 욕실 거울. 소년과 반사는 아직 일치함
+- `05:18–05:40` 맞은편 어둠이 반사에만 천천히 나타남
+- `05:40–06:00` 검은 그림자가 소년의 반사와 겹쳐 둘의 경계가 잠시 모호해짐
+- `06:00–06:26` 거울의 검은 영역이 짧은 암전을 거쳐 밤의 침실 구석으로 이어짐
+- `06:26–07:00` 잠든 소년에게 방의 그림자가 분리되어 다가옴
+- `07:00–07:30` 오리지널 보코더용 첫 음성. 존재는 얼굴·눈·형체 없이 남음
+- `07:30–08:02` 다음 날, 자세가 달라진 소년이 자신 있게 등교함
+- `08:02–08:24` 소년과 방향이 어긋난 그림자가 뒤에 붙어 따라옴
+- `08:24–08:48` 사람이 없는 서비스 도로와 주차된 차를 넓은 숏으로 확인
+- `08:48–09:18` 차가 천천히 약 30cm 떠오름. 광선이나 슈퍼히어로 포즈는 없음
+- `09:18–09:42` 작은 성취감이 통제를 잃는 불안으로 바뀜
+- `09:42–10:04` 차가 내려온 뒤 색과 공간감이 빠지며 공포/전쟁의 톤으로 전환
+- `10:04–10:36` 저녁 방. 화면 밖 고양이는 작은 목걸이와 방울로만 암시
+- `10:36–11:00` 그림자가 대가를 요구하고 소년이 짧게 거절함
+- `11:00–11:12` 벽과 사물의 그림자가 분리되며 공격이 시작됨
+- `11:12–12:00` 방의 가장자리가 검은 우주 같은 무공간으로 천천히 지워짐
+- `12:00–12:42` 힘으로 맞서려 하지만 통하지 않고, 소년이 자신의 의지로 다시 거절함
+- `12:42–13:06` 마지막 빛과 호흡이 좁아지는 위험한 순간
+- `13:06–13:14` 음악 스팅어 없이 날카로운 들숨과 함께 침대의 와이드 숏으로 돌아옴
+- `13:14–13:40` 평범한 새벽 룸톤 속 클로즈업에서 호흡을 가라앉히며 안도함
+- `13:40–13:52` 침대 옆에 처음과 같은 편지가 놓여 있음을 발견
+- `13:52–14:00` 두려움인지 다시 힘을 원하는지 읽히지 않는 표정으로 종료
 
 현재 시간 하나로 카메라, 레이어, 오브젝트 상태를 계산하므로 재생바를 앞뒤로 움직여도 해당 프레임이 즉시 재현됩니다.
 
@@ -151,6 +200,14 @@ public/
 - `public/images/backgrounds/scene-3-door-handle-broken.png`
 - `public/images/backgrounds/scene-3-morning-garden.png`
 - `public/images/backgrounds/scene-3-boy-anxious.png`
+- `public/images/backgrounds/chapter-3-mirror-normal.png`
+- `public/images/backgrounds/chapter-3-mirror-shadow.png`
+- `public/images/backgrounds/chapter-3-bedroom-shadow.png`
+- `public/images/backgrounds/chapter-3-school-shadow.png`
+- `public/images/backgrounds/chapter-4-road-car-grounded.png`
+- `public/images/backgrounds/chapter-4-road-car-lifted.png`
+- `public/images/backgrounds/chapter-4-refusal.png`
+- `public/images/backgrounds/chapter-5-void-resistance.png`
 
 편지와 천은 실제 종이·섬유 질감이 들어간 투명 PNG입니다. Scene 2의 소년은 실사형 투명 PNG 레이어를 사용합니다.
 
@@ -224,6 +281,25 @@ export const SCENE_3_ASSETS = {
 };
 ```
 
+후반부의 영화 플레이트는 `LATER_STORY_ASSETS`에서 한 번에 교체합니다.
+
+```ts
+export const LATER_STORY_ASSETS = {
+  bathroomNormal: "/images/backgrounds/chapter-3-mirror-normal.png",
+  bathroomShadow: "/images/backgrounds/chapter-3-mirror-shadow.png",
+  sleepingRoom: "/images/backgrounds/chapter-3-bedroom-shadow.png",
+  schoolWalk: "/images/backgrounds/chapter-3-school-shadow.png",
+  roadGrounded: "/images/backgrounds/chapter-4-road-car-grounded.png",
+  roadLifted: "/images/backgrounds/chapter-4-road-car-lifted.png",
+  confrontation: "/images/backgrounds/chapter-4-refusal.png",
+  voidResistance: "/images/backgrounds/chapter-5-void-resistance.png",
+  dawnRoom: SCENE_3_ASSETS.morningRoom,
+  dawnFace: SCENE_3_ASSETS.anxiousBoy,
+};
+```
+
+거울 두 장과 자동차 두 장은 같은 해상도·크롭·렌즈·인물 위치로 등록된 상태여야 디졸브가 실제 움직임처럼 읽힙니다. 후반부 인물과 자동차의 물리 동작은 플레이트 안에 두고, 웹에서는 카메라 이동·초점·색·암부만 조절합니다.
+
 문고리 연속 프레임은 모두 동일한 해상도·렌즈·크롭·문고리 위치를 유지해야 전환이 흔들리지 않습니다. 새 프레임을 만들 때 손의 크기, 소매, 광원 방향도 이전 프레임과 같게 유지하세요. 돌과 꽃은 투명 배경 PNG/WebP로 준비하고 피사체 주변 여백을 현재 파일과 비슷하게 맞추면 CSS 위치값을 그대로 사용할 수 있습니다.
 
 새 에셋은 투명 배경 PNG 또는 WebP를 권장합니다. 봉투 앞면·뒷면·열린 상태의 비율과 여백을 비슷하게 맞추면 컷 전환 때 위치가 흔들리지 않습니다. 편지지는 문구를 HTML로 올리므로 글자가 없는 원본을 사용하고, 흰 천은 한 장을 세 번 재사용하므로 충분히 긴 가로 형태로 준비합니다.
@@ -242,7 +318,7 @@ export const SCENE_3_ASSETS = {
 - `textStyle`: 색, 크기, 자간, 폭, 정렬
 - `sceneColorGrade`: 밝기, 대비, 채도, 색 온도, 그림자
 
-전체 길이와 바로가기, 문장도 같은 파일의 `durationSeconds`, `sceneMarkers`, `textCues`에서 바꿉니다. `textCues.paperYPercent`는 편지 위 문장 위치와 카메라가 읽을 지점을 함께 정합니다. `FULL_SHOW_SCENE_MARKERS`에는 향후 30분 MP4용 장면 예시가 준비되어 있습니다.
+전체 길이와 바로가기, 문장도 같은 파일의 `durationSeconds`, `sceneMarkers`, `textCues`에서 바꿉니다. `textCues.paperYPercent`는 편지 위 문장 위치와 카메라가 읽을 지점을 함께 정합니다. `FIVE_CHAPTER_MARKERS`가 숫자키 1–5의 시작점을 관리합니다.
 
 Scene 2는 같은 파일의 두 객체로 분리되어 있습니다.
 
@@ -256,7 +332,15 @@ Scene 3도 같은 방식으로 분리되어 있습니다.
 - `SCENE_3_ASSETS`: 아침 방, 문고리 정상/파손, 정원, 소년 클로즈업, 돌, 꽃 경로
 - `SCENE_3_TIMING`: 문고리 접촉·파단, 돌의 이동·부유·낙하, 꽃의 굽힘·복원, 마지막 클로즈업 시점
 
-`SCENE_3_TIMING`의 값을 바꾸면 화면 동작과 해당 오디오 큐가 함께 이동합니다. Scene 3의 종료값 `end`가 현재 전체 플레이어 길이입니다.
+`SCENE_3_TIMING`의 값을 바꾸면 화면 동작과 해당 오디오 큐가 함께 이동합니다.
+
+후반부도 같은 방식으로 분리되어 있습니다.
+
+- `LATER_STORY_ASSETS`: 거울, 침실, 등굣길, 자동차, 거절, 검은 공간, 마지막 침실 플레이트
+- `LATER_STORY_TIMING`: `04:52–14:00`의 모든 서브 컷 경계
+- `FIVE_CHAPTER_MARKERS`: `00:00`, `02:48`, `05:36`, `08:24`, `11:12`의 공연자용 챕터 시작점
+
+현재 전체 플레이어 길이는 `LATER_STORY_TIMING.end`의 `840`초입니다.
 
 ## 완성 MP4로 전환
 
@@ -300,6 +384,23 @@ public/audio/scene-3/stone-contact.mp3
 public/audio/scene-3/flower-rustle.mp3
 public/audio/scene-3/anxious-breath.mp3
 ```
+
+후반부는 다음 교체 슬롯을 사용합니다.
+
+```text
+public/audio/chapter-3/bathroom-room-tone.mp3
+public/audio/chapter-3/bedroom-night.mp3
+public/audio/chapter-3/shadow-whisper.mp3
+public/audio/chapter-3/school-street.mp3
+public/audio/chapter-4/empty-road.mp3
+public/audio/chapter-4/car-metal-strain.mp3
+public/audio/chapter-4/command-room.mp3
+public/audio/chapter-4/shadow-command.mp3
+public/audio/chapter-5/void-pressure.mp3
+public/audio/chapter-5/dawn-room.mp3
+```
+
+첫 그림자 음성은 유혹에 가까운 짧은 인간 속삭임과 20–30ms 먼저 도착하는 낮은 보코더 레이어로 설계합니다. 명령 장면에서는 가공량을 줄여 의미가 더 명확해지게 하되, 특정 영화의 언어·억양·음색은 모사하지 않습니다.
 
 각 파일의 시작·종료·볼륨·페이드는 `playerConfig.ts`의 `audioCues`에서 관리합니다. 파일이 아직 없어도 화면 재생, 탐색, 일시정지는 중단되지 않습니다.
 

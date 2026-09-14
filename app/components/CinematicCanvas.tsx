@@ -11,6 +11,7 @@ import {
   SCENE_2_TIMING,
   SCENE_3_ASSETS,
   SCENE_3_TIMING,
+  LATER_STORY_TIMING,
   type TimelineSegment,
 } from "../config/playerConfig";
 
@@ -75,6 +76,18 @@ const coherentNoise = (x: number, y: number) => {
 
 const sceneProgress = (scene: TimelineSegment, timeSeconds: number) =>
   smooth(scene.startSeconds, scene.endSeconds, timeSeconds);
+
+type LightingPreset = "legacy" | "bathroom" | "night" | "neutral" | "dusk" | "cosmic" | "dawn";
+
+const getLightingPreset = (sceneId: string): LightingPreset => {
+  if (sceneId.startsWith("mirror-")) return "bathroom";
+  if (["sleeping-room", "shadow-approach", "shadow-first-voice"].includes(sceneId)) return "night";
+  if (["school-confidence", "school-attached-shadow", "empty-road", "car-lift", "car-unease", "fear-pivot"].includes(sceneId)) return "neutral";
+  if (["demand-build", "command-refusal", "attack-begins"].includes(sceneId)) return "dusk";
+  if (["void-dissolve", "void-resistance", "mortal-edge"].includes(sceneId)) return "cosmic";
+  if (["dream-wake", "dawn-relief", "letter-returns", "ambiguous-ending"].includes(sceneId)) return "dawn";
+  return "legacy";
+};
 
 const cameraStyle = (
   scene: TimelineSegment,
@@ -184,6 +197,19 @@ function AtmosphereCanvas({
       "first-sign-handle",
       "first-sign-aftermath",
       "first-sign-anxious",
+      "mirror-normal",
+      "mirror-shadow",
+      "mirror-overlap",
+      "sleeping-room",
+      "shadow-approach",
+      "shadow-first-voice",
+      "demand-build",
+      "command-refusal",
+      "attack-begins",
+      "dream-wake",
+      "dawn-relief",
+      "letter-returns",
+      "ambiguous-ending",
     ].includes(scene.id);
     if (interior) {
       particles.slice(0, 25).forEach((dust, index) => {
@@ -192,8 +218,10 @@ function AtmosphereCanvas({
         const y = (dust.y * height - drift * 0.22 + height) % height;
         context.beginPath();
         context.arc(x, y, 0.35 + (index % 3) * 0.18, 0, Math.PI * 2);
-        context.fillStyle = scene.id === "threshold-spell"
-          ? `rgba(151, 172, 179, ${0.018 + dust.alpha * 0.09})`
+        const coldDust = scene.id === "threshold-spell" || scene.id.startsWith("mirror-") ||
+          ["sleeping-room", "shadow-approach", "shadow-first-voice", "demand-build", "command-refusal", "attack-begins"].includes(scene.id);
+        context.fillStyle = coldDust
+          ? `rgba(151, 172, 179, ${0.016 + dust.alpha * 0.085})`
           : `rgba(207, 190, 157, ${0.024 + dust.alpha * 0.14})`;
         context.fill();
       });
@@ -205,7 +233,13 @@ function AtmosphereCanvas({
         ? 0.035
         : scene.id === "threshold-spell"
           ? 0.022
-          : 0.014;
+          : ["empty-road", "car-lift", "car-unease", "fear-pivot"].includes(scene.id)
+            ? 0.024
+            : ["school-confidence", "school-attached-shadow"].includes(scene.id)
+              ? 0.012
+              : ["void-dissolve", "void-resistance", "mortal-edge"].includes(scene.id)
+                ? 0.004
+                : 0.014;
     for (let index = 0; index < 3; index += 1) {
       const fogY = height * (0.5 + index * 0.14);
       const drift = Math.sin(timeSeconds * (0.035 + index * 0.008) + index) * width * 0.04;
@@ -727,6 +761,110 @@ function FirstSignScene({ timeSeconds, scene }: { timeSeconds: number; scene: Ti
   return null;
 }
 
+/**
+ * 후반부의 추가 처리는 인물 동작을 만들지 않고, 이미 촬영된 듯한 플레이트 위에
+ * 빛·그림자·초점만 아주 얕게 더합니다. 모든 값은 절대 시간으로 계산되어 탐색 후에도
+ * 같은 프레임이 재현됩니다.
+ */
+function LaterStoryTreatment({ timeSeconds, sceneId }: { timeSeconds: number; sceneId: string }) {
+  const timing = LATER_STORY_TIMING;
+
+  if (sceneId === "mirror-shadow" || sceneId === "mirror-overlap") {
+    const reveal = smooth(timing.mirrorNormalEnd, timing.mirrorShadowEnd - 2, timeSeconds);
+    const overlap = smooth(timing.mirrorShadowEnd, timing.mirrorOverlapEnd - 2.5, timeSeconds);
+    return (
+      <>
+        <div
+          className="story-mirror-breath"
+          style={{
+            opacity: reveal * 0.24,
+            transform: `translate3d(${mix(-1.4, 0.5, reveal)}%, ${Math.sin(timeSeconds * 0.23) * 0.18}%, 0) scale(${1 + overlap * 0.035})`,
+          }}
+        />
+        <div className="story-mirror-edge" style={{ opacity: mix(0.08, 0.27, overlap) }} />
+      </>
+    );
+  }
+
+  if (["sleeping-room", "shadow-approach", "shadow-first-voice"].includes(sceneId)) {
+    const approach = smooth(timing.sleepingEnd - 2, timing.firstVoiceEnd - 5, timeSeconds);
+    const voicePulse = sceneId === "shadow-first-voice"
+      ? 0.5 + Math.sin((timeSeconds - timing.shadowApproachEnd) * 0.32) * 0.08
+      : 0;
+    return (
+      <>
+        <div
+          className="story-bedside-darkness"
+          style={{
+            opacity: approach * (0.2 + voicePulse * 0.1),
+            transform: `translate3d(${mix(-4.5, 1.2, approach)}%, ${Math.sin(timeSeconds * 0.17) * 0.2}%, 0) scale(${mix(0.98, 1.045, approach)})`,
+          }}
+        />
+        <div className="story-night-falloff" style={{ opacity: 0.14 + approach * 0.16 }} />
+      </>
+    );
+  }
+
+  if (sceneId === "school-attached-shadow") {
+    const lag = smooth(timing.schoolConfidenceEnd, timing.schoolShadowEnd - 2, timeSeconds);
+    return (
+      <div
+        className="story-impossible-shadow"
+        style={{
+          opacity: lag * 0.16,
+          transform: `translate3d(${mix(-1.2, 0.8, lag)}%, ${Math.sin(timeSeconds * 0.28) * 0.12}%, 0) rotate(${mix(-1.4, 0.6, lag)}deg)`,
+        }}
+      />
+    );
+  }
+
+  if (["demand-build", "command-refusal", "attack-begins"].includes(sceneId)) {
+    const pressure = smooth(timing.fearPivotEnd, timing.attackStartEnd, timeSeconds);
+    return (
+      <>
+        <div className="story-command-shadow" style={{ opacity: 0.12 + pressure * 0.22 }} />
+        <div
+          className="story-depth-collapse"
+          style={{
+            opacity: sceneId === "attack-begins" ? smooth(timing.refusalEnd, timing.attackStartEnd, timeSeconds) * 0.36 : 0,
+          }}
+        />
+      </>
+    );
+  }
+
+  if (["void-dissolve", "void-resistance", "mortal-edge"].includes(sceneId)) {
+    const local = clamp((timeSeconds - timing.attackStartEnd) / (timing.mortalEdgeEnd - timing.attackStartEnd));
+    return (
+      <>
+        <div
+          className="story-void-breath"
+          style={{
+            opacity: mix(0.06, 0.16, local),
+            transform: `scale(${1 + Math.sin(timeSeconds * 0.16) * 0.018})`,
+          }}
+        />
+        <div className="story-void-falloff" style={{ opacity: mix(0.06, 0.2, local) }} />
+      </>
+    );
+  }
+
+  if (["dream-wake", "dawn-relief", "letter-returns", "ambiguous-ending"].includes(sceneId)) {
+    const settle = smooth(timing.mortalEdgeEnd, timing.reliefEnd, timeSeconds);
+    return (
+      <div
+        className="story-dawn-window"
+        style={{
+          opacity: mix(0.2, 0.09, settle),
+          transform: `translate3d(${Math.sin(timeSeconds * 0.08) * 0.16}%, 0, 0)`,
+        }}
+      />
+    );
+  }
+
+  return null;
+}
+
 function SceneProps({ timeSeconds, scene }: { timeSeconds: number; scene: TimelineSegment }) {
   if (scene.id === "letter-flight") {
     const flight = getFlightState(timeSeconds);
@@ -825,6 +963,31 @@ function SceneProps({ timeSeconds, scene }: { timeSeconds: number; scene: Timeli
     );
   }
 
+  if (scene.id === "letter-returns") {
+    const reveal = smooth(LATER_STORY_TIMING.reliefEnd, LATER_STORY_TIMING.reliefEnd + 2.8, timeSeconds);
+    const focus = smooth(LATER_STORY_TIMING.reliefEnd + 1.2, LATER_STORY_TIMING.letterRevealEnd, timeSeconds);
+    return (
+      <div className="story-returned-letter">
+        <div
+          className="story-returned-letter-shadow"
+          style={{
+            opacity: reveal * mix(0.38, 0.5, focus),
+            transform: `translate(-50%, -50%) translate3d(${focus * 2.9}vw, ${focus * -2.6}vh, 0) rotate(-7deg)`,
+          }}
+        />
+        <img
+          className="story-returned-envelope"
+          src={PROP_ASSETS.envelopeFront}
+          alt=""
+          style={{
+            opacity: reveal,
+            transform: `translate(-50%, -50%) translate3d(${focus * 2.9}vw, ${focus * -2.6}vh, 0) perspective(950px) rotateX(57deg) rotateZ(-7deg) scale(${mix(0.97, 1.045, focus)})`,
+          }}
+        />
+      </div>
+    );
+  }
+
   if (scene.id === "ritual-prep") return <RitualTriangle timeSeconds={timeSeconds} standing={false} />;
   if (scene.id === "inside-triangle") return <RitualTriangle timeSeconds={timeSeconds} standing />;
   if (scene.id === "threshold-spell") return <ThresholdSpellScene timeSeconds={timeSeconds} />;
@@ -842,6 +1005,7 @@ export function CinematicCanvas({ timeSeconds }: { timeSeconds: number }) {
   const sceneIndex = matchedIndex === -1 ? PLAYER_CONFIG.timeline.length - 1 : matchedIndex;
   const scene = PLAYER_CONFIG.timeline[sceneIndex];
   const previousScene = sceneIndex > 0 ? PLAYER_CONFIG.timeline[sceneIndex - 1] : null;
+  const lightingPreset = getLightingPreset(scene.id);
   const transition = scene.id === "first-sign-aftermath"
     ? 1
     : sceneIndex === 0
@@ -907,7 +1071,7 @@ export function CinematicCanvas({ timeSeconds }: { timeSeconds: number }) {
 
   return (
     <div
-      className={`cinematic-animatic scene-${scene.id}`}
+      className={`cinematic-animatic scene-${scene.id} lighting-${lightingPreset}`}
       style={stageTransform ? { transform: stageTransform } : undefined}
       aria-hidden="true"
     >
@@ -943,11 +1107,19 @@ export function CinematicCanvas({ timeSeconds }: { timeSeconds: number }) {
         <div
           className="room-shadow"
           style={{
-            opacity: ["boy", "letter-flight", "after-reading"].includes(scene.id)
-              ? 0.18
-              : scene.id.startsWith("first-sign-")
-                ? 0.12
-                : 0.18,
+            opacity: lightingPreset === "neutral"
+              ? 0
+              : lightingPreset === "cosmic"
+                ? 0.08
+                : lightingPreset === "bathroom"
+                  ? 0.12
+                  : lightingPreset === "night" || lightingPreset === "dusk"
+                    ? 0.2
+                    : ["boy", "letter-flight", "after-reading"].includes(scene.id)
+                      ? 0.18
+                      : scene.id.startsWith("first-sign-")
+                        ? 0.12
+                        : 0.18,
           }}
         />
         <div
@@ -957,6 +1129,7 @@ export function CinematicCanvas({ timeSeconds }: { timeSeconds: number }) {
             transform: `translate3d(${Math.sin(timeSeconds * (scene.id === "time-passage" ? 0.3 : 0.11)) * (scene.id === "time-passage" ? 1.35 : 0.7)}%, 0, 0)`,
           }}
         />
+        <LaterStoryTreatment timeSeconds={timeSeconds} sceneId={scene.id} />
       </div>
 
       {scene.characterImage && !thresholdScene ? (

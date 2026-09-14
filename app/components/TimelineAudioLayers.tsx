@@ -94,7 +94,11 @@ export function TimelineAudioLayers({
   muted: boolean;
   masterVolume: number;
 }) {
-  return PLAYER_CONFIG.audioCues.map((cue) => (
+  const nearbyCues = PLAYER_CONFIG.audioCues.filter(
+    (cue) => currentTime >= cue.startSeconds - 8 && currentTime <= cue.endSeconds + 2,
+  );
+
+  return nearbyCues.map((cue) => (
     <TimelineAudioTrack
       key={cue.id}
       cue={cue}

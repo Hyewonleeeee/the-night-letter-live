@@ -43,7 +43,9 @@ export function CinematicPlayer() {
     const finalLetter = clamp((currentTime - 68.4) / 1.2, 0, 1) *
       clamp((72.2 - currentTime) / 0.8, 0, 1);
     const ritualSilence = clamp((currentTime - 153) / 6, 0, 1);
-    const scene2Silence = clamp((currentTime - 159.4) / 1.4, 0, 1);
+    const scene2SilenceIn = clamp((currentTime - 159.4) / 1.4, 0, 1);
+    const scene2SilenceOut = clamp((currentTime - 202) / 3, 0, 1);
+    const scene2Silence = scene2SilenceIn * (1 - scene2SilenceOut);
     const baseLevel = Math.max(0.56, 1 - finalLetter * 0.2 - ritualSilence * 0.32);
     return baseLevel * (1 - scene2Silence);
   }, [currentTime]);
@@ -146,7 +148,16 @@ export function CinematicPlayer() {
     anchorRef.current = performance.now() - currentTimeRef.current * 1000;
 
     const tick = (now: number) => {
-      const nextTime = Math.min(duration, (now - anchorRef.current) / 1000);
+      const media = mediaRef.current;
+      const mediaClockAvailable = Boolean(
+        media && !media.paused && media.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA,
+      );
+      const nextTime = Math.min(
+        duration,
+        mediaClockAvailable && media
+          ? media.currentTime
+          : (now - anchorRef.current) / 1000,
+      );
       currentTimeRef.current = nextTime;
       if (now - lastPaintRef.current > 15 || nextTime >= duration) {
         lastPaintRef.current = now;
@@ -326,7 +337,7 @@ export function CinematicPlayer() {
 
           <div className="player-title-strip" aria-hidden="true">
             <span>{PLAYER_CONFIG.title}</span>
-            <span>{isVideoMode ? "MP4" : `LAYERED ANIMATIC / ${Math.round(duration)} SEC`}</span>
+            <span>{isVideoMode ? "MP4" : `FIVE CHAPTER ANIMATIC / ${formatTime(duration)}`}</span>
           </div>
         </div>
 
@@ -340,7 +351,7 @@ export function CinematicPlayer() {
                 onClick={() => seekTo(marker.timeSeconds)}
                 title={`${formatTime(marker.timeSeconds)}로 이동`}
               >
-                <kbd>{index < 9 ? index + 1 : index === 9 ? 0 : "S3"}</kbd>
+                <kbd>{index + 1}</kbd>
                 <span>{marker.label}</span>
                 <time>{formatTime(marker.timeSeconds)}</time>
               </button>
@@ -421,7 +432,7 @@ export function CinematicPlayer() {
           </div>
 
           <p className="player-key-help">
-            SPACE 재생·일시정지 · ← → 5초 이동 · 숫자키 장면 이동 · 더블클릭 전체 화면
+            SPACE 재생·일시정지 · ← → 5초 이동 · 숫자키 1–5 챕터 이동 · 더블클릭 전체 화면
           </p>
         </div>
       </section>
