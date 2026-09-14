@@ -244,6 +244,9 @@ export function CinematicPlayer() {
   const displayTextCue = currentScene.textPosition === "paper-camera"
     ? undefined
     : currentTextCue;
+  const displayTextPosition = displayTextCue?.group === "dialogue"
+    ? "dialogue"
+    : currentScene.textPosition;
   const textOpacity = useMemo(() => {
     if (!currentTextCue) return 0;
     const fadeDuration = currentTextCue.group === "dialogue" ? 0.22 : 0.7;
@@ -320,7 +323,7 @@ export function CinematicPlayer() {
 
           {displayTextCue ? (
             <p
-              className={`film-text position-${currentScene.textPosition} ${displayTextCue.emphasis ? "is-emphasis" : ""}`}
+              className={`film-text position-${displayTextPosition} ${displayTextCue.emphasis ? "is-emphasis" : ""}`}
               style={{
                 opacity: textOpacity,
                 color: currentScene.textStyle.color,

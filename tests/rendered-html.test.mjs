@@ -124,18 +124,20 @@ test("builds the complete 14-minute animatic as five operator chapters", async (
     "utf8",
   );
 
-  assert.match(config, /export const LATER_STORY_TIMING/);
+  assert.match(config, /export const FULL_STORY_TIMING/);
   assert.match(config, /end:\s*840/);
-  assert.match(config, /durationSeconds:\s*LATER_STORY_TIMING\.end/);
+  assert.match(config, /durationSeconds:\s*FULL_STORY_TIMING\.end/);
   assert.match(config, /export const FIVE_CHAPTER_MARKERS/);
   for (const start of [0, 168, 336, 504, 672]) {
     assert.match(config, new RegExp(`timeSeconds:\\s*${start}\\b`));
   }
-  assert.match(config, /III · THE SHADOW/);
+  assert.match(config, /III · THE BARGAIN/);
   assert.match(config, /IV · THE PRICE/);
   assert.match(config, /V · THE RETURN/);
-  assert.match(config, /Bring me the cat\./);
-  assert.match(config, /You don't lead me\./);
+  assert.match(config, /Give me a living vessel\./);
+  assert.match(config, /The contract is over\./);
+  assert.match(config, /Avada Kedavra\./);
+  assert.match(config, /I had the strangest dream\./);
 });
 
 test("ships every replaceable plate used by the five-chapter continuation", async () => {
@@ -148,39 +150,43 @@ test("ships every replaceable plate used by the five-chapter continuation", asyn
     "chapter-4-road-car-lifted.png",
     "chapter-4-refusal.png",
     "chapter-5-void-resistance.png",
+    "chapter-2-family-evening.png",
+    "scene-3-morning-garden-scorched.png",
+    "chapter-3-snail-offering.png",
+    "chapter-3-snail-shadow.png",
+    "chapter-3-thumb-payment.png",
+    "chapter-4-empty-dog-bed.png",
+    "chapter-4-family-threat.png",
+    "chapter-5-final-spell.png",
+    "chapter-5-serpent-pov.png",
+    "chapter-5-breakfast-letter.png",
   ].map((filename) => access(
     new URL(`../public/images/backgrounds/${filename}`, import.meta.url),
   )));
 });
 
-test("ships the seekable 22-shot Chapter 3 motion edit", async () => {
+test("ships the seekable 99-shot four-chapter story recut", async () => {
   const config = await readFile(
     new URL("../app/config/playerConfig.ts", import.meta.url),
     "utf8",
   );
   const renderScript = await readFile(
-    new URL("../scripts/render-chapter-3.mjs", import.meta.url),
+    new URL("../scripts/render-story-recut.mjs", import.meta.url),
     "utf8",
   );
 
-  assert.match(config, /chapter-3-shadow-motion-pass/);
-  assert.match(config, /startSeconds:\s*336/);
-  assert.match(config, /endSeconds:\s*504/);
-  assert.match(renderScript, /shots\.length/);
-  assert.match(renderScript, /totalDuration !== 168/);
-
-  await access(new URL(
-    "../public/video/chapter-3/the-shadow-motion-pass.mp4",
-    import.meta.url,
-  ));
+  assert.match(config, /chapter-2-first-sign-recut/);
+  assert.match(config, /chapter-3-contract-recut/);
+  assert.match(config, /chapter-4-price-recut/);
+  assert.match(config, /chapter-5-return-recut/);
+  assert.match(renderScript, /chapter\.shots\.reduce/);
 
   await Promise.all([
-    "chapter-3-mirror-sink-insert.png",
-    "chapter-3-bedroom-curtain-insert.png",
-    "chapter-3-bedroom-doorway-insert.png",
-    "chapter-3-school-empty-insert.png",
-    "chapter-3-school-feet-insert.png",
+    "chapter-2/the-first-sign-recut.mp4",
+    "chapter-3/the-contract-recut.mp4",
+    "chapter-4/the-price-recut.mp4",
+    "chapter-5/the-return-recut.mp4",
   ].map((filename) => access(
-    new URL(`../public/images/backgrounds/${filename}`, import.meta.url),
+    new URL(`../public/video/${filename}`, import.meta.url),
   )));
 });

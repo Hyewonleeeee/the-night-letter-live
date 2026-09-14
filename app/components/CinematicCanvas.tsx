@@ -1222,7 +1222,7 @@ export function CinematicCanvas({ timeSeconds, playing = false }: { timeSeconds:
       ) : null}
 
       <div className="animatic-layer layer-props">
-        <SceneProps timeSeconds={timeSeconds} scene={scene} />
+        {!activeMotionClip ? <SceneProps timeSeconds={timeSeconds} scene={scene} /> : null}
       </div>
 
       {scene.foregroundImage ? (

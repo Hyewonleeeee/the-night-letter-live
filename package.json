@@ -11,6 +11,8 @@
     "build:pages": "vite build --config vite.pages.config.ts",
     "render:chapter3": "node scripts/render-chapter-3.mjs",
     "verify:chapter3": "node scripts/verify-chapter-3.mjs",
+    "render:story": "node scripts/render-story-recut.mjs",
+    "verify:story": "node scripts/verify-story-recut.mjs",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
     "test": "npm run build && node --test tests/rendered-html.test.mjs",
     "typecheck": "tsc --noEmit",

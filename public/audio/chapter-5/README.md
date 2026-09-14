@@ -1,6 +1,8 @@
-# Chapter 5 audio slots
+# Chapter 5 audio slots — 11:12–14:00
 
-- `void-pressure.mp3` — 음악보다 압력과 호흡에 가까운 낮은 질감
-- `dawn-room.mp3` — 깨어난 뒤의 평범한 새벽 룸톤
+- `void-pressure.mp3` — 전투 장면의 낮은 압력과 호흡 질감
+- `dawn-room.mp3` — 꿈에서 깬 뒤 새벽과 아침의 평범한 룸톤
+- 권장 추가 슬롯: `serpent-floor.mp3`, `breakfast-room.mp3`, `letter-slide.mp3`
 
-`13:06` 부근 꿈에서 깨는 순간에는 큰 스팅어 대신 날카로운 들숨과 평범한 방 소리의 복귀를 사용합니다.
+`13:10`에는 큰 점프스케어 대신 시야가 닫히는 짧은 저역과 들숨을 사용하고,
+`13:14`부터 즉시 평범한 방과 가족의 소리로 돌아옵니다.
