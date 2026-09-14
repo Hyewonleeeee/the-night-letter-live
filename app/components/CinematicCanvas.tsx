@@ -13,6 +13,7 @@ import {
   SCENE_3_TIMING,
   LATER_STORY_TIMING,
   type TimelineSegment,
+  type ChapterMotionClip,
 } from "../config/playerConfig";
 
 type AtmosphereParticle = {
@@ -76,6 +77,60 @@ const coherentNoise = (x: number, y: number) => {
 
 const sceneProgress = (scene: TimelineSegment, timeSeconds: number) =>
   smooth(scene.startSeconds, scene.endSeconds, timeSeconds);
+
+function ChapterMotionVideo({
+  clip,
+  timeSeconds,
+  playing,
+}: {
+  clip: ChapterMotionClip;
+  timeSeconds: number;
+  playing: boolean;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const localTime = clamp(timeSeconds - clip.startSeconds, 0, clip.endSeconds - clip.startSeconds);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const sync = () => {
+      const tolerance = playing ? 0.22 : 0.025;
+      if (Math.abs(video.currentTime - localTime) > tolerance) {
+        try {
+          video.currentTime = localTime;
+        } catch {
+          // Metadata may still be loading; onLoadedMetadata performs the same sync.
+        }
+      }
+
+      if (playing) {
+        video.play().catch(() => {
+          // The timeline still advances if a browser delays the silent video start.
+        });
+      } else {
+        video.pause();
+      }
+    };
+
+    sync();
+  }, [localTime, playing]);
+
+  return (
+    <video
+      ref={videoRef}
+      className="chapter-motion-video"
+      src={clip.source}
+      muted
+      playsInline
+      preload="auto"
+      onLoadedMetadata={(event) => {
+        event.currentTarget.currentTime = localTime;
+        if (playing) event.currentTarget.play().catch(() => {});
+      }}
+    />
+  );
+}
 
 type LightingPreset = "legacy" | "bathroom" | "night" | "neutral" | "dusk" | "cosmic" | "dawn";
 
@@ -998,13 +1053,16 @@ function SceneProps({ timeSeconds, scene }: { timeSeconds: number; scene: Timeli
   return null;
 }
 
-export function CinematicCanvas({ timeSeconds }: { timeSeconds: number }) {
+export function CinematicCanvas({ timeSeconds, playing = false }: { timeSeconds: number; playing?: boolean }) {
   const matchedIndex = PLAYER_CONFIG.timeline.findIndex(
     (segment) => timeSeconds >= segment.startSeconds && timeSeconds < segment.endSeconds,
   );
   const sceneIndex = matchedIndex === -1 ? PLAYER_CONFIG.timeline.length - 1 : matchedIndex;
   const scene = PLAYER_CONFIG.timeline[sceneIndex];
   const previousScene = sceneIndex > 0 ? PLAYER_CONFIG.timeline[sceneIndex - 1] : null;
+  const activeMotionClip = PLAYER_CONFIG.chapterMotionClips.find(
+    (clip) => timeSeconds >= clip.startSeconds && timeSeconds < clip.endSeconds,
+  );
   const lightingPreset = getLightingPreset(scene.id);
   const transition = scene.id === "first-sign-aftermath"
     ? 1
@@ -1030,7 +1088,7 @@ export function CinematicCanvas({ timeSeconds }: { timeSeconds: number }) {
   const scene3MorningBlack = scene.id === "first-sign-morning"
     ? 1 - smooth(SCENE_3_TIMING.start, SCENE_3_TIMING.start + 3.1, timeSeconds)
     : 0;
-  const transitionBlack = scene.transitionType === "fade-black" && scene.id !== "fade-out"
+  const transitionBlack = !activeMotionClip && scene.transitionType === "fade-black" && scene.id !== "fade-out"
     ? Math.sin(transition * Math.PI) * 0.82
     : 0;
   const blackout = Math.max(
@@ -1076,7 +1134,14 @@ export function CinematicCanvas({ timeSeconds }: { timeSeconds: number }) {
       aria-hidden="true"
     >
       <div className="animatic-layer layer-background">
-        {previousScene && previousOpacity > 0 ? (
+        {activeMotionClip ? (
+          <ChapterMotionVideo
+            clip={activeMotionClip}
+            timeSeconds={timeSeconds}
+            playing={playing}
+          />
+        ) : null}
+        {!activeMotionClip && previousScene && previousOpacity > 0 ? (
           <img
             src={previousScene.backgroundImage}
             alt=""
@@ -1086,14 +1151,16 @@ export function CinematicCanvas({ timeSeconds }: { timeSeconds: number }) {
             }}
           />
         ) : null}
-        <img
-          src={scene.backgroundImage}
-          alt=""
-          style={{
-            ...cameraStyle(scene, timeSeconds, rackBlur),
-            opacity: currentOpacity,
-          }}
-        />
+        {!activeMotionClip ? (
+          <img
+            src={scene.backgroundImage}
+            alt=""
+            style={{
+              ...cameraStyle(scene, timeSeconds, rackBlur),
+              opacity: currentOpacity,
+            }}
+          />
+        ) : null}
       </div>
 
       <div className="animatic-layer layer-midground">
@@ -1129,7 +1196,7 @@ export function CinematicCanvas({ timeSeconds }: { timeSeconds: number }) {
             transform: `translate3d(${Math.sin(timeSeconds * (scene.id === "time-passage" ? 0.3 : 0.11)) * (scene.id === "time-passage" ? 1.35 : 0.7)}%, 0, 0)`,
           }}
         />
-        <LaterStoryTreatment timeSeconds={timeSeconds} sceneId={scene.id} />
+        {!activeMotionClip ? <LaterStoryTreatment timeSeconds={timeSeconds} sceneId={scene.id} /> : null}
       </div>
 
       {scene.characterImage && !thresholdScene ? (

@@ -295,7 +295,7 @@ export function CinematicPlayer() {
                 }}
               />
             ) : (
-              <CinematicCanvas timeSeconds={currentTime} />
+              <CinematicCanvas timeSeconds={currentTime} playing={playing} />
             )}
           </LiveVisualStage>
 
@@ -337,7 +337,7 @@ export function CinematicPlayer() {
 
           <div className="player-title-strip" aria-hidden="true">
             <span>{PLAYER_CONFIG.title}</span>
-            <span>{isVideoMode ? "MP4" : `FIVE CHAPTER ANIMATIC / ${formatTime(duration)}`}</span>
+            <span>{isVideoMode ? "MP4" : `HYBRID FILM CUT / ${formatTime(duration)}`}</span>
           </div>
         </div>
 

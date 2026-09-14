@@ -78,6 +78,14 @@ export type TimelineAudioCue = {
   loop?: boolean;
 };
 
+export type ChapterMotionClip = {
+  id: string;
+  label: string;
+  source: string;
+  startSeconds: number;
+  endSeconds: number;
+};
+
 export type PlayerConfig = {
   title: string;
   renderMode: PlayerRenderMode;
@@ -88,6 +96,7 @@ export type PlayerConfig = {
   timeline: TimelineSegment[];
   textCues: PlayerTextCue[];
   audioCues: TimelineAudioCue[];
+  chapterMotionClips: ChapterMotionClip[];
 };
 
 const serifLetterStyle: SceneTextStyle = {
@@ -270,6 +279,11 @@ export const LATER_STORY_ASSETS = {
   bathroomShadow: "/images/backgrounds/chapter-3-mirror-shadow.png",
   sleepingRoom: "/images/backgrounds/chapter-3-bedroom-shadow.png",
   schoolWalk: "/images/backgrounds/chapter-3-school-shadow.png",
+  mirrorSinkInsert: "/images/backgrounds/chapter-3-mirror-sink-insert.png",
+  bedroomCurtainInsert: "/images/backgrounds/chapter-3-bedroom-curtain-insert.png",
+  bedroomDoorwayInsert: "/images/backgrounds/chapter-3-bedroom-doorway-insert.png",
+  schoolFeetInsert: "/images/backgrounds/chapter-3-school-feet-insert.png",
+  schoolEmptyInsert: "/images/backgrounds/chapter-3-school-empty-insert.png",
   roadGrounded: "/images/backgrounds/chapter-4-road-car-grounded.png",
   roadLifted: "/images/backgrounds/chapter-4-road-car-lifted.png",
   confrontation: "/images/backgrounds/chapter-4-refusal.png",
@@ -341,9 +355,9 @@ export const LATER_STORY_TIMING = {
   start: SCENE_3_TIMING.end,
   mirrorNormalEnd: 318,
   mirrorShadowEnd: 340,
-  mirrorOverlapEnd: 360,
-  sleepingEnd: 386,
-  shadowApproachEnd: 420,
+  mirrorOverlapEnd: 366,
+  sleepingEnd: 390,
+  shadowApproachEnd: 422,
   firstVoiceEnd: 450,
   schoolConfidenceEnd: 482,
   schoolShadowEnd: 504,
@@ -382,6 +396,15 @@ export const PLAYER_CONFIG: PlayerConfig = {
   durationSeconds: LATER_STORY_TIMING.end,
   videoSource: "/video/performance-film.mp4",
   animationAudioSource: "/audio/test-scene-soundtrack.mp3",
+  chapterMotionClips: [
+    {
+      id: "chapter-3-shadow-motion-pass",
+      label: "III · THE SHADOW — 22-shot motion edit",
+      source: "/video/chapter-3/the-shadow-motion-pass.mp4",
+      startSeconds: 336,
+      endSeconds: 504,
+    },
+  ],
   sceneMarkers: FIVE_CHAPTER_MARKERS,
   timeline: [
     {

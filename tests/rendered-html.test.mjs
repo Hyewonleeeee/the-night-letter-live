@@ -152,3 +152,35 @@ test("ships every replaceable plate used by the five-chapter continuation", asyn
     new URL(`../public/images/backgrounds/${filename}`, import.meta.url),
   )));
 });
+
+test("ships the seekable 22-shot Chapter 3 motion edit", async () => {
+  const config = await readFile(
+    new URL("../app/config/playerConfig.ts", import.meta.url),
+    "utf8",
+  );
+  const renderScript = await readFile(
+    new URL("../scripts/render-chapter-3.mjs", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(config, /chapter-3-shadow-motion-pass/);
+  assert.match(config, /startSeconds:\s*336/);
+  assert.match(config, /endSeconds:\s*504/);
+  assert.match(renderScript, /shots\.length/);
+  assert.match(renderScript, /totalDuration !== 168/);
+
+  await access(new URL(
+    "../public/video/chapter-3/the-shadow-motion-pass.mp4",
+    import.meta.url,
+  ));
+
+  await Promise.all([
+    "chapter-3-mirror-sink-insert.png",
+    "chapter-3-bedroom-curtain-insert.png",
+    "chapter-3-bedroom-doorway-insert.png",
+    "chapter-3-school-empty-insert.png",
+    "chapter-3-school-feet-insert.png",
+  ].map((filename) => access(
+    new URL(`../public/images/backgrounds/${filename}`, import.meta.url),
+  )));
+});
