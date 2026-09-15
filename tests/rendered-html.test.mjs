@@ -110,12 +110,10 @@ test("keeps Scene 3 bounded to The First Sign and ships its replaceable assets",
     new URL(`../public/images/backgrounds/${filename}`, import.meta.url),
   )));
 
-  await Promise.all([
-    "scene-3-small-stone.png",
-    "scene-3-wildflower.png",
-  ].map((filename) => access(
-    new URL(`../public/images/props/${filename}`, import.meta.url),
-  )));
+  assert.doesNotMatch(config, /first-sign-stone/);
+  assert.match(config, /first-sign-school/);
+  assert.match(config, /first-sign-car/);
+  assert.match(config, /first-sign-garden-consequence/);
 });
 
 test("builds the complete 14-minute animatic as five operator chapters", async () => {
@@ -143,7 +141,7 @@ test("builds the complete 14-minute animatic as five operator chapters", async (
 test("ships every replaceable plate used by the five-chapter continuation", async () => {
   await Promise.all([
     "chapter-3-mirror-normal.png",
-    "chapter-3-mirror-shadow.png",
+    "chapter-3-mirror-shadow-human.png",
     "chapter-3-bedroom-shadow.png",
     "chapter-3-school-shadow.png",
     "chapter-4-road-car-grounded.png",

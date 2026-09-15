@@ -54,7 +54,7 @@ export const FIRST_SIGN_LIVE_CHAPTER: LiveChapterScore = {
       operations: [{ kind: "set", property: "grainAmount", value: 0.008, durationSeconds: 4 }],
     },
     { code: "" },
-    { code: 'await firstSign.observe("stone", { force: "unknown" });' },
+    { code: 'await firstSign.observe("parked_car", { force: "unknown" });' },
     {
       code: "camera.push(0.024, 9);",
       cueLabel: "CAMERA / FOLLOW",
@@ -71,7 +71,7 @@ export const FIRST_SIGN_LIVE_CHAPTER: LiveChapterScore = {
       operations: [{ kind: "set", property: "windAmount", value: 0.1, durationSeconds: 6 }],
     },
     { code: "" },
-    { code: 'await firstSign.observe("flower", { wind: false });' },
+    { code: 'await firstSign.observe("scorched_flower", { heat: false });' },
     {
       code: "light.cool(0.046, 8);",
       cueLabel: "LIGHT / DOUBT",

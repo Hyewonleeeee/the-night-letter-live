@@ -25,7 +25,7 @@ const images = {
   garden: "public/images/backgrounds/scene-3-morning-garden.png",
   gardenScorched: "public/images/backgrounds/scene-3-morning-garden-scorched.png",
   mirrorNormal: "public/images/backgrounds/chapter-3-mirror-normal.png",
-  mirrorShadow: "public/images/backgrounds/chapter-3-mirror-shadow.png",
+  mirrorShadow: "public/images/backgrounds/chapter-3-mirror-shadow-human.png",
   mirrorSink: "public/images/backgrounds/chapter-3-mirror-sink-insert.png",
   schoolWalk: "public/images/backgrounds/chapter-3-school-shadow.png",
   schoolFeet: "public/images/backgrounds/chapter-3-school-feet-insert.png",

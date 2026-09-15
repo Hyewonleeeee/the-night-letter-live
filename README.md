@@ -164,6 +164,7 @@ public/video/chapter-5/the-return-recut.mp4      # 168초 / 24숏
 
 - `chapter-2-family-evening.png`
 - `scene-3-morning-garden-scorched.png`
+- `chapter-3-mirror-shadow-human.png`
 - `chapter-3-snail-offering.png`
 - `chapter-3-snail-shadow.png`
 - `chapter-3-thumb-payment.png`
@@ -176,6 +177,11 @@ public/video/chapter-5/the-return-recut.mp4      # 168초 / 24숏
 같은 이름의 16:9 이미지로 교체한 뒤 `npm run render:story`를 실행하면 새
 플레이트가 영상에 반영됩니다. 인물 교체 시 머리, 검은 니트, 키, 렌즈 높이와
 광원 방향을 기존 이미지와 맞추는 것이 중요합니다.
+
+거울 속 사람형 그림자는 `public/images/textures/mirror-human-shadow-layer.png`를
+거울 플레이트에 합성한 것입니다. 형상의 크기나 농도를 바꿀 때는
+`scripts/render-story-recut.mjs`의 `mirrorShadow` 플레이트를 교체한 뒤 Chapter 2를
+다시 렌더합니다. 예전 테스트용 작은 돌 장면은 최종 이야기에서 제거되었습니다.
 
 ## 완성 MP4 한 파일로 교체
 
