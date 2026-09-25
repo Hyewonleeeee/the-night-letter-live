@@ -3,10 +3,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   FIRST_SIGN_LIVE_CHAPTER,
-  LIVE_CHAPTERS,
   buildLiveChapterTypingPlan,
   getRevealedCharacterCount,
 } from "../config/liveChapterScore";
+import type { LivePerformanceChapterId } from "../config/livePerformanceChapters";
 import { LIVE_VISUAL_CHANNEL, type LiveVisualOperation } from "../lib/liveCoding";
 import {
   isLiveChapterControlMessage,
@@ -22,7 +22,7 @@ type LiveChapterRunnerProps = {
 
 type RunnerSession = {
   runId: string;
-  chapterId: string;
+  chapterId: LivePerformanceChapterId;
   phase: LiveChapterPhase;
   elapsedMs: number;
   revision: number;
@@ -48,7 +48,7 @@ export function LiveChapterRunner({ onOperations }: LiveChapterRunnerProps) {
   const [session, setSession] = useState<RunnerSession | null>(null);
   const [frame, setFrame] = useState<RunnerFrame>(EMPTY_FRAME);
 
-  const score = session ? LIVE_CHAPTERS[session.chapterId] : FIRST_SIGN_LIVE_CHAPTER;
+  const score = FIRST_SIGN_LIVE_CHAPTER;
   const plan = useMemo(() => buildLiveChapterTypingPlan(score), [score]);
 
   const updateSession = useCallback((next: RunnerSession | null) => {
@@ -131,7 +131,7 @@ export function LiveChapterRunner({ onOperations }: LiveChapterRunnerProps) {
 
   useEffect(() => {
     if (!session || session.phase !== "running") return;
-    const activeScore = LIVE_CHAPTERS[session.chapterId];
+    const activeScore = FIRST_SIGN_LIVE_CHAPTER;
     const activePlan = buildLiveChapterTypingPlan(activeScore);
     const startedAt = performance.now();
     const baseElapsed = session.elapsedMs;

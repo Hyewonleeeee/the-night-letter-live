@@ -1,8 +1,10 @@
-# Chapter 5 audio slots — 11:12–14:00
+# Chapter 5 — The Return — 11:12–14:00
 
-- `void-pressure.mp3` — 전투 장면의 낮은 압력과 호흡 질감
-- `dawn-room.mp3` — 꿈에서 깬 뒤 새벽과 아침의 평범한 룸톤
-- 권장 추가 슬롯: `serpent-floor.mp3`, `breakfast-room.mp3`, `letter-slide.mp3`
+- `void-pressure.mp3` (01:54) — 전투 장면의 낮은 압력과 호흡 질감
+- `final-spell-surge.mp3` (00:14) — 마지막 주문 전후의 짧고 절제된 상승
+- `serpent-floor.mp3` (00:34) — 좌우로 미끄러지는 낮은 바닥 마찰
+- `dawn-room.mp3` (00:54) — 꿈에서 깬 뒤 새벽과 아침의 평범한 룸톤
+- `letter-slide.mp3` (00:11) — 마지막 편지가 테이블 위로 미끄러지는 종이 소리
 
 `13:10`에는 큰 점프스케어 대신 시야가 닫히는 짧은 저역과 들숨을 사용하고,
 `13:14`부터 즉시 평범한 방과 가족의 소리로 돌아옵니다.

@@ -7,6 +7,50 @@
 주인공은 웰링턴 외곽에 사는 12세 소년 **Noah Leo Henry Daniel Minhyuk Kim
 (MH)**입니다.
 
+## 11월 공연용 4분 50초 예고편
+
+12월용 14분 본편은 그대로 보존되어 있습니다. 11월 `New Music Performance`
+발표용 예고편은 별도 페이지와 설정을 사용하므로 두 버전의 타임라인은 서로
+영향을 주지 않습니다.
+
+- `http://localhost:3000/trailer`: 4분 50초 예고편 단독 플레이어
+- `http://localhost:3000/live-trailer`: 왼쪽 영상 + 오른쪽 라이브 코딩 공연 화면
+- `https://hyewonleeeee.github.io/the-night-letter-live/`: 관람용 무음 예고편 공개 링크
+- `app/config/trailerConfig.ts`: 예고편 길이, 세 챕터, 숏, 공연용 코드
+- `app/components/TrailerCanvas.tsx`: 영상 레이어와 인트로·아웃트로 신호 그래픽
+
+예고편은 공연자가 반드시 **세 번만 복사·붙여넣기**하도록 구성했습니다.
+
+1. `COPY CHAPTER 01` → 코드 편집기에 `Cmd/Ctrl + V`
+2. 첫 챕터가 끝나면 `COPY CHAPTER 02` → `Cmd/Ctrl + V`
+3. 두 번째 챕터가 끝나면 `COPY CHAPTER 03` → `Cmd/Ctrl + V`
+
+붙여넣는 즉시 해당 영상과 코드 타임라인이 시작됩니다. 코드는 한꺼번에 표시되지
+않고 장면의 실제 시간에 맞춰 오른쪽 편집기에 천천히 완성됩니다. 일시정지와
+재생 위치 이동도 코드 타이핑에 동기화되며, 챕터 끝에서는 영상과 코드가 함께
+멈춥니다.
+
+11월 예고편은 완전한 **무음 버전**입니다. 오디오 레이어, 음소거 버튼, 볼륨
+컨트롤을 모두 제거했으며 공연 음악과 음향은 외부 연주 시스템에서 담당합니다.
+
+### 예고편 3챕터 타임라인
+
+- `00:00–01:10` **I · THE MARK** — 신호 인트로, 집, 편지, 손가락 삼각형
+- `01:10–02:35` **II · THE FIRST SIGN** — 아침, 문고리 파손, 책의 공중부양
+- `02:35–04:50` **III · THE RETURN** — 거울 속 검은 그림자가 귀 가까이 접근,
+  소년의 시야가 꺼지고 빈 세면대로 전환, 다음 날 침대에서 안도, 되돌아온 편지,
+  두려운 표정과 검은 화면, 5초 크레딧
+
+인트로와 챕터 전환에는 삼각형 선, 스캔라인, 데이터 점을 절제한
+TouchDesigner 계열의 신호 그래픽을 사용합니다. 마지막 크레딧은
+`TO BE CONTINUED / IN NEW MUSIC PERFORMANCE / A PERFORMANCE BY HYE-JEONG`입니다.
+무대 재생 중 마우스를 움직이지 않으면 플레이어 컨트롤은 2.4초 뒤 자동으로
+사라집니다.
+
+예고편 전용 교체 이미지는 `public/images/trailer`에 있습니다. 동일한 파일명과
+비율로 이미지를 바꾸면 코드 수정 없이 즉시 반영됩니다. 생성 방법과 이미지별
+의도는 해당 폴더의 `README.md`를 참고합니다.
+
 ## 현재 편집 방식
 
 - `00:00–03:22`: 기존 레이어 애니매틱. 편지, 의식, “Alohomora.”와 빈
@@ -164,7 +208,7 @@ public/video/chapter-5/the-return-recut.mp4      # 168초 / 24숏
 
 - `chapter-2-family-evening.png`
 - `scene-3-morning-garden-scorched.png`
-- `chapter-3-mirror-shadow-human.png`
+- `chapter-3-mirror-shadow-black.png`
 - `chapter-3-snail-offering.png`
 - `chapter-3-snail-shadow.png`
 - `chapter-3-thumb-payment.png`
@@ -178,8 +222,8 @@ public/video/chapter-5/the-return-recut.mp4      # 168초 / 24숏
 플레이트가 영상에 반영됩니다. 인물 교체 시 머리, 검은 니트, 키, 렌즈 높이와
 광원 방향을 기존 이미지와 맞추는 것이 중요합니다.
 
-거울 속 사람형 그림자는 `public/images/textures/mirror-human-shadow-layer.png`를
-거울 플레이트에 합성한 것입니다. 형상의 크기나 농도를 바꿀 때는
+거울 속 형상은 `public/images/textures/mirror-apparition-shadow-layer-black.png`의
+표면광과 의상 질감을 제거한 완전한 검은 그림자 실루엣을 거울 플레이트에 합성한 것입니다. 형상의 크기나 농도를 바꿀 때는
 `scripts/render-story-recut.mjs`의 `mirrorShadow` 플레이트를 교체한 뒤 Chapter 2를
 다시 렌더합니다. 예전 테스트용 작은 돌 장면은 최종 이야기에서 제거되었습니다.
 
@@ -193,9 +237,76 @@ public/video/chapter-5/the-return-recut.mp4      # 168초 / 24숏
 
 `/live`는 왼쪽 플레이어와 오른쪽 실제 코드 편집기를 한 화면에 표시합니다.
 
+### AUTO TYPE 공연 방식
+
+1. 오른쪽 위의 `AUTO TYPE`을 선택합니다.
+2. `CHAPTER 01–05` 중 하나를 선택합니다.
+3. `PERFORM CHAPTER`를 누릅니다.
+
+선택한 챕터의 영상과 앰비언스가 즉시 시작되고, 오른쪽에는 전체 코드가 한꺼번에
+나타나지 않습니다. 선언부가 먼저 입력된 뒤 각 `.at()` 큐가 실제 장면 직전에
+자동으로 타이핑됩니다. 큐 사이에는 커서가 기다리며, 편집기는 현재 입력 위치까지
+자동 스크롤됩니다. 왼쪽 영상을 일시정지하거나 재생바로 이동하면 코드도 같은
+시간으로 정지하거나 이동합니다. 챕터 마지막에는 `.run()`까지 완성되고 영상은
+마지막 프레임에서 멈춥니다.
+
+전체 챕터 코드를 직접 복사해 `AUTO TYPE` 편집기에 붙여 넣어도 검사 후 곧바로 같은
+공연이 시작됩니다. 따라서 무대에서는 챕터 버튼 방식과 코드 복사·붙여넣기 방식 중
+하나만 선택하면 됩니다. 직접 한 줄씩 실행하려면 언제든 `MANUAL`로 돌아갑니다.
+
 - `Cmd/Ctrl + Enter`: 현재 줄 또는 선택 영역 실행
-- `Cmd/Ctrl + Shift + Enter`: 전체 실행
-- `RUN LINE`, `RUN ALL`, `RESET FRAME`, `CLEAR`, `FULL DESK`
+- `Cmd/Ctrl + Shift + Enter`: 붙여 넣은 챕터 전체 실행
+- `CHAPTER 01–05`: 검증된 각 챕터 코드를 편집기에 불러오기
+- `RUN LINE`, `RUN CHAPTER`, `RESET FRAME`, `CLEAR`, `FULL DESK`
+
+각 챕터 버튼을 누른 뒤 `RUN CHAPTER`를 실행하면 해당 구간 시작점으로 이동하고,
+구간의 마지막 프레임에서 자동으로 멈춥니다. 경계는 `00:00 / 03:22 / 05:36 /
+08:24 / 11:12 / 14:00`입니다. 코드 전체를 먼저 검사하므로 오타가 있으면 영상이나
+앰비언스가 일부만 실행되지 않습니다. 다섯 개의 전체 복사 코드는
+`app/config/livePerformanceChapters.ts`의 `LIVE_CHAPTER_SOURCES`에 있습니다.
+
+```ts
+// THE NIGHT LETTER / CHAPTER 01
+const invitation = chapter("01_invitation");
+
+invitation.at(0).shot("wellington_house");
+invitation.at(0).ambience("exterior_wind", 0.46, -0.12);
+invitation.at(12).shot("boy_at_window");
+invitation.at(12).ambience("interior_room", 0.28, 0.06);
+
+invitation.at(24).prop("letter").enter("wind_curve");
+invitation.at(24).ambience("letter_whoosh", 0.72, 0); // L -> R
+invitation.at(34).ambience("paper_close", 0.52, 0.08);
+invitation.at(45).shot("letter_open");
+invitation.at(52).ambience("letter_taps", 0.46, -0.04);
+invitation.at(80).transition("next_night");
+invitation.at(80).ambience("time_shift", 0.34, 0);
+
+invitation.at(110).ritual("white_triangle");
+invitation.at(110).ambience("ritual_air", 0.3, 0);
+invitation.at(145).character("boy").enterTriangle();
+
+invitation.at(171.25).speak("Alohomora");
+invitation.at(172.35).ambience("threshold_drone", 0.22, 0);
+invitation.at(184.8).shot("empty_triangle");
+invitation.at(198).fade("black", 4);
+
+invitation.run();
+```
+
+실제 Chapter 1 앰비언스는 `public/audio/chapter-1`의 로컬 MP3 레이어를 사용합니다.
+집 밖의 바람에서 방 안의 먹먹한 공기로 크로스페이드되고, 00:24 편지는 파일 자체에
+기록된 좌→우 패닝으로 지나갑니다. 00:34부터는 봉투를 만지고 여는 종이 마찰음,
+00:52부터는 편지의 다섯 문장 노출 시간에 맞춘 절제된 타닥거림이 이어집니다.
+01:18–01:52 시간 전환과 의식 준비도 서로 겹쳐 페이드되며, 주문 직후에는 기존의
+저음 드론이 들어옵니다. 공연 시작 전에 왼쪽 플레이어의 재생 버튼을 한 번 눌렀다가
+정지하면 브라우저의 오디오 자동재생 잠금을 확실히 해제할 수 있습니다.
+
+전체 공연 사운드를 다시 생성하려면 `npm run render:show-audio`를 실행합니다.
+교체 파일명과 정확한 길이는 `public/audio/chapter-1`부터 `chapter-5`까지 각 README에
+정리되어 있습니다.
+
+짧은 화면 효과 명령은 기존 방식으로 계속 실행할 수 있습니다.
 
 ```ts
 camera.push(0.018, 8);

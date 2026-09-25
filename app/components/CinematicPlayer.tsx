@@ -8,9 +8,20 @@ import {
   useState,
 } from "react";
 import { PLAYER_CONFIG } from "../config/playerConfig";
+import {
+  LIVE_PERFORMANCE_CHAPTERS,
+  getLiveAmbienceCueId,
+  getLiveChapterHoldTime,
+} from "../config/livePerformanceChapters";
+import { LIVE_VISUAL_CHANNEL } from "../lib/liveCoding";
+import {
+  isLiveChapterStartMessage,
+  type LiveChapterPhase,
+  type LiveChapterStatusMessage,
+} from "../lib/liveChapterProtocol";
 import { CinematicCanvas } from "./CinematicCanvas";
 import { LiveVisualStage } from "./LiveVisualStage";
-import { TimelineAudioLayers } from "./TimelineAudioLayers";
+import { TimelineAudioLayers, type LiveAudioMix } from "./TimelineAudioLayers";
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
@@ -22,6 +33,14 @@ const formatTime = (seconds: number) => {
   return `${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
 };
 
+type ActiveLiveChapter = {
+  runId: string;
+  chapterId: keyof typeof LIVE_PERFORMANCE_CHAPTERS;
+  startSeconds: number;
+  endSeconds: number;
+  phase: LiveChapterPhase;
+};
+
 export function CinematicPlayer() {
   const isVideoMode = PLAYER_CONFIG.renderMode === "video";
   const shellRef = useRef<HTMLElement>(null);
@@ -31,6 +50,9 @@ export function CinematicPlayer() {
   const frameRef = useRef<number | null>(null);
   const lastPaintRef = useRef(0);
   const controlsTimerRef = useRef<number | null>(null);
+  const liveChannelRef = useRef<BroadcastChannel | null>(null);
+  const activeLiveChapterRef = useRef<ActiveLiveChapter | null>(null);
+  const lastChapterStatusAtRef = useRef(0);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(PLAYER_CONFIG.durationSeconds);
@@ -38,6 +60,31 @@ export function CinematicPlayer() {
   const [volume, setVolume] = useState(0.78);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
+  const [completedChapterEnd, setCompletedChapterEnd] = useState<number | null>(null);
+  const [liveAudioMix, setLiveAudioMix] = useState<LiveAudioMix>({});
+
+  const postLiveChapterStatus = useCallback((
+    active: ActiveLiveChapter,
+    phase: LiveChapterPhase,
+    absoluteTime: number,
+  ) => {
+    const elapsedSeconds = phase === "complete"
+      ? active.endSeconds - active.startSeconds
+      : clamp(absoluteTime - active.startSeconds, 0, active.endSeconds - active.startSeconds);
+    const message: LiveChapterStatusMessage = {
+      kind: "live-chapter:status",
+      version: 1,
+      runId: active.runId,
+      chapterId: active.chapterId,
+      phase,
+      elapsedMs: elapsedSeconds * 1000,
+      totalMs: (active.endSeconds - active.startSeconds) * 1000,
+      revealedCharacters: 0,
+      cueIndex: 0,
+      at: Date.now(),
+    };
+    liveChannelRef.current?.postMessage(message);
+  }, []);
 
   const soundtrackLevel = useMemo(() => {
     const finalLetter = clamp((currentTime - 68.4) / 1.2, 0, 1) *
@@ -65,6 +112,7 @@ export function CinematicPlayer() {
       const nextTime = clamp(timeSeconds, 0, duration);
       currentTimeRef.current = nextTime;
       setCurrentTime(nextTime);
+      setCompletedChapterEnd(null);
       anchorRef.current = performance.now() - nextTime * 1000;
       syncMediaTime(nextTime);
     },
@@ -74,12 +122,17 @@ export function CinematicPlayer() {
   const pause = useCallback(() => {
     mediaRef.current?.pause();
     setPlaying(false);
+    const active = activeLiveChapterRef.current;
+    if (active?.phase === "running") {
+      active.phase = "paused";
+      postLiveChapterStatus(active, "paused", currentTimeRef.current);
+    }
     setControlsVisible(true);
     if (controlsTimerRef.current !== null) {
       window.clearTimeout(controlsTimerRef.current);
       controlsTimerRef.current = null;
     }
-  }, []);
+  }, [postLiveChapterStatus]);
 
   const play = useCallback(() => {
     let startTime = currentTimeRef.current;
@@ -92,6 +145,12 @@ export function CinematicPlayer() {
       // Canvas playback remains available while placeholder media is absent.
     });
     setPlaying(true);
+    setCompletedChapterEnd(null);
+    const active = activeLiveChapterRef.current;
+    if (active?.phase === "paused") {
+      active.phase = "running";
+      postLiveChapterStatus(active, "running", currentTimeRef.current);
+    }
     setControlsVisible(true);
     if (controlsTimerRef.current !== null) {
       window.clearTimeout(controlsTimerRef.current);
@@ -99,7 +158,20 @@ export function CinematicPlayer() {
     controlsTimerRef.current = window.setTimeout(() => {
       setControlsVisible(false);
     }, 2_600);
-  }, [duration, seekTo]);
+  }, [duration, postLiveChapterStatus, seekTo]);
+
+  const finishLiveChapter = useCallback((active: ActiveLiveChapter) => {
+    const holdTime = getLiveChapterHoldTime(active.chapterId);
+    mediaRef.current?.pause();
+    currentTimeRef.current = holdTime;
+    setCurrentTime(holdTime);
+    syncMediaTime(holdTime);
+    setPlaying(false);
+    setControlsVisible(true);
+    setCompletedChapterEnd(active.endSeconds);
+    active.phase = "complete";
+    postLiveChapterStatus(active, "complete", active.endSeconds);
+  }, [postLiveChapterStatus, syncMediaTime]);
 
   const togglePlayback = useCallback(() => {
     if (playing) pause();
@@ -152,8 +224,11 @@ export function CinematicPlayer() {
       const mediaClockAvailable = Boolean(
         media && !media.paused && media.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA,
       );
+      const active = activeLiveChapterRef.current;
+      const playbackEnd = active?.phase === "running" ? active.endSeconds : duration;
       const nextTime = Math.min(
         duration,
+        playbackEnd,
         mediaClockAvailable && media
           ? media.currentTime
           : (now - anchorRef.current) / 1000,
@@ -162,6 +237,11 @@ export function CinematicPlayer() {
       if (now - lastPaintRef.current > 15 || nextTime >= duration) {
         lastPaintRef.current = now;
         setCurrentTime(nextTime);
+      }
+      if (active?.phase === "running" && nextTime >= active.endSeconds - 0.01) {
+        frameRef.current = null;
+        finishLiveChapter(active);
+        return;
       }
       if (nextTime >= duration) {
         mediaRef.current?.pause();
@@ -180,7 +260,50 @@ export function CinematicPlayer() {
         frameRef.current = null;
       }
     };
-  }, [duration, isVideoMode, playing]);
+  }, [duration, finishLiveChapter, isVideoMode, playing]);
+
+  useEffect(() => {
+    if (!("BroadcastChannel" in window)) return;
+    const channel = new BroadcastChannel(LIVE_VISUAL_CHANNEL);
+    liveChannelRef.current = channel;
+
+    channel.onmessage = (event: MessageEvent<unknown>) => {
+      if (!isLiveChapterStartMessage(event.data)) return;
+      const chapter = LIVE_PERFORMANCE_CHAPTERS[event.data.chapterId];
+      const active: ActiveLiveChapter = {
+        runId: event.data.runId,
+        chapterId: event.data.chapterId,
+        startSeconds: chapter.startSeconds,
+        endSeconds: chapter.endSeconds,
+        phase: "running",
+      };
+      activeLiveChapterRef.current = active;
+      const ambienceEntries: Array<[string, { gain: number; pan: number }]> = [];
+      event.data.ambienceMix.forEach((mix) => {
+        const cueId = getLiveAmbienceCueId(mix.id);
+        if (cueId) ambienceEntries.push([cueId, { gain: mix.gain, pan: mix.pan }]);
+      });
+      setLiveAudioMix(Object.fromEntries(ambienceEntries));
+      lastChapterStatusAtRef.current = 0;
+      seekTo(chapter.startSeconds);
+      play();
+      postLiveChapterStatus(active, "running", chapter.startSeconds);
+    };
+
+    return () => {
+      channel.close();
+      if (liveChannelRef.current === channel) liveChannelRef.current = null;
+    };
+  }, [play, postLiveChapterStatus, seekTo]);
+
+  useEffect(() => {
+    const active = activeLiveChapterRef.current;
+    if (!active || active.phase !== "running") return;
+    const now = performance.now();
+    if (now - lastChapterStatusAtRef.current < 240) return;
+    lastChapterStatusAtRef.current = now;
+    postLiveChapterStatus(active, "running", currentTime);
+  }, [currentTime, postLiveChapterStatus]);
 
   useEffect(() => {
     const timerRef = controlsTimerRef;
@@ -261,6 +384,7 @@ export function CinematicPlayer() {
     0,
   );
   const timelineProgress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const displayedCurrentTime = completedChapterEnd ?? currentTime;
 
   return (
     <main className="player-page">
@@ -287,6 +411,11 @@ export function CinematicPlayer() {
                 }}
                 onTimeUpdate={(event) => {
                   const nextTime = event.currentTarget.currentTime;
+                  const active = activeLiveChapterRef.current;
+                  if (active?.phase === "running" && nextTime >= active.endSeconds - 0.01) {
+                    finishLiveChapter(active);
+                    return;
+                  }
                   currentTimeRef.current = nextTime;
                   setCurrentTime(nextTime);
                 }}
@@ -314,6 +443,7 @@ export function CinematicPlayer() {
                 playing={playing}
                 muted={muted}
                 masterVolume={volume}
+                liveMix={liveAudioMix}
               />
             </>
           ) : null}
@@ -402,7 +532,7 @@ export function CinematicPlayer() {
             </div>
 
             <div className="time-display" aria-label="현재 재생 시간과 전체 시간">
-              <strong>{formatTime(currentTime)}</strong>
+              <strong>{formatTime(displayedCurrentTime)}</strong>
               <span>/</span>
               <time>{formatTime(duration)}</time>
             </div>

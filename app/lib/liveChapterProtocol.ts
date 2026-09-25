@@ -1,4 +1,7 @@
-import { LIVE_CHAPTERS } from "../config/liveChapterScore";
+import {
+  LIVE_PERFORMANCE_CHAPTERS,
+  type LivePerformanceChapterId,
+} from "../config/livePerformanceChapters";
 
 export type LiveChapterPhase = "running" | "paused" | "complete" | "aborted";
 
@@ -6,7 +9,12 @@ export type LiveChapterStartMessage = {
   kind: "live-chapter:start";
   version: 1;
   runId: string;
-  chapterId: string;
+  chapterId: LivePerformanceChapterId;
+  ambienceMix: Array<{
+    id: string;
+    gain: number;
+    pan: number;
+  }>;
   at: number;
 };
 
@@ -22,7 +30,7 @@ export type LiveChapterStatusMessage = {
   kind: "live-chapter:status";
   version: 1;
   runId: string;
-  chapterId: string;
+  chapterId: LivePerformanceChapterId;
   phase: LiveChapterPhase;
   elapsedMs: number;
   totalMs: number;
@@ -40,7 +48,14 @@ export function isLiveChapterStartMessage(value: unknown): value is LiveChapterS
     value.version === 1 &&
     typeof value.runId === "string" &&
     typeof value.chapterId === "string" &&
-    value.chapterId in LIVE_CHAPTERS;
+    value.chapterId in LIVE_PERFORMANCE_CHAPTERS &&
+    Array.isArray(value.ambienceMix) &&
+    value.ambienceMix.every((mix) =>
+      isObject(mix) &&
+      typeof mix.id === "string" &&
+      typeof mix.gain === "number" && Number.isFinite(mix.gain) &&
+      typeof mix.pan === "number" && Number.isFinite(mix.pan)
+    );
 }
 
 export function isLiveChapterControlMessage(value: unknown): value is LiveChapterControlMessage {
@@ -58,7 +73,7 @@ export function isLiveChapterStatusMessage(value: unknown): value is LiveChapter
     value.version !== 1 ||
     typeof value.runId !== "string" ||
     typeof value.chapterId !== "string" ||
-    !(value.chapterId in LIVE_CHAPTERS)
+    !(value.chapterId in LIVE_PERFORMANCE_CHAPTERS)
   ) return false;
 
   return ["running", "paused", "complete", "aborted"].includes(String(value.phase)) &&

@@ -1,6 +1,9 @@
 # Scene 2 audio placeholders
 
-아래 파일명을 그대로 사용하면 `playerConfig.ts`의 타임라인에 자동으로 맞춰집니다.
+아래 파일은 향후 대사·효과음 녹음용 교체 목록입니다. 현재 Chapter 1 라이브 버전은
+404 요청을 피하기 위해 이 파일들을 활성 재생 목록에 넣지 않았습니다. 현재는
+`../chapter-1/ritual-air.mp3`가 주문 전까지 이어지고,
+`../chapter-1/threshold-drone.mp3`가 주문 직후부터 재생됩니다.
 
 - `halloween-night.mp3` — 먼 바람, 풀벌레, 나뭇잎의 매우 작은 루프
 - `boy-inhale.mp3` — 주문 전 짧은 들숨

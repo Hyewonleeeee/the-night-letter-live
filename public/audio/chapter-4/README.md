@@ -1,8 +1,8 @@
-# Chapter 4 audio slots — 08:24–11:12
+# Chapter 4 — The Price — 08:24–11:12
 
-- `command-room.mp3` — 빈 반려견 자리와 계약 해지 장면의 낮은 룸톤
-- `shadow-command.mp3` — 가족을 위협하는 보코더 음성
-- `empty-road.mp3` — 필요하면 다른 환경음으로 교체 가능한 기존 슬롯
-- `car-metal-strain.mp3` — Chapter 2 자동차 장면으로 옮겨 쓸 수 있는 금속음
+- `consequence-room.mp3` (02:48) — 빈 반려견 자리에서 전투 직전까지 이어지는 낮은 룸톤
+- `loss-rumble.mp3` (00:48) — 상실을 깨닫는 동안만 서서히 생기는 저역 압력
+- `family-shadow.mp3` (01:48) — 가족에게 그림자가 접근할수록 조금씩 짙어지는 공간음
+- `shadow-command.mp3` (00:36) — 보코더 라이브 음성 아래에 놓는 절제된 호흡·캐리어 질감
 
 반려견의 죽음은 소리와 빈 침대·목걸이로만 암시합니다.

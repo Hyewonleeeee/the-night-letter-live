@@ -1,4 +1,4 @@
-name: Deploy cinematic player to GitHub Pages
+name: Deploy silent November trailer to GitHub Pages
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Build static player
+      - name: Build static silent trailer
         run: npm run build:pages
       - name: Configure Pages
         uses: actions/configure-pages@v5

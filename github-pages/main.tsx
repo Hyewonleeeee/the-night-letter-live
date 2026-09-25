@@ -1,10 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { CinematicPlayer } from "../app/components/CinematicPlayer";
+import { TrailerPlayer } from "../app/components/TrailerPlayer";
 import "../app/globals.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <CinematicPlayer />
+    <TrailerPlayer />
   </StrictMode>,
 );
