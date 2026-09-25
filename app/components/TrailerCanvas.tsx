@@ -57,7 +57,8 @@ function SignalField({ timeSeconds }: { timeSeconds: number }) {
       : 0;
     const blackout = timeSeconds >= 273 ? smooth((timeSeconds - 273) / 10) : 0;
     const signal = Math.max(intro, chapterThree, blackout * 0.92);
-    const subtle = 0.045 + signal * 0.22;
+    if (signal <= 0.001) return;
+    const subtle = signal * 0.27;
     const centreX = bounds.width * (0.5 + Math.sin(timeSeconds * 0.08) * 0.018);
     const centreY = bounds.height * (0.49 + Math.cos(timeSeconds * 0.07) * 0.012);
     const radius = Math.min(bounds.width, bounds.height) * (0.22 + signal * 0.11);
@@ -113,7 +114,11 @@ export function TrailerCanvas({ timeSeconds }: { timeSeconds: number }) {
     (shot) => timeSeconds >= shot.startSeconds && timeSeconds < shot.endSeconds,
   );
   const activeShot = activeIndex >= 0 ? TRAILER_SHOTS[activeIndex] : null;
-  const previousShot = activeIndex > 0 ? TRAILER_SHOTS[activeIndex - 1] : null;
+  const precedingShot = activeIndex > 0 ? TRAILER_SHOTS[activeIndex - 1] : null;
+  const previousShot = activeShot && precedingShot
+    && Math.abs(activeShot.startSeconds - precedingShot.endSeconds) < 0.05
+    ? precedingShot
+    : null;
   const transition = activeShot
     ? smooth((timeSeconds - activeShot.startSeconds) / (activeShot.transitionSeconds ?? 0.9))
     : 0;
@@ -125,8 +130,8 @@ export function TrailerCanvas({ timeSeconds }: { timeSeconds: number }) {
   const whisperFigureOpacity = smooth((timeSeconds - 197) / 2.2)
     * (1 - smooth((timeSeconds - 209) / 3));
   const finalDarkness = smooth((timeSeconds - 268) / 17);
-  const collapseBlack = timeSeconds >= 226 && timeSeconds < 235
-    ? Math.sin(((timeSeconds - 226) / 9) * Math.PI)
+  const collapseBlack = timeSeconds >= 228 && timeSeconds < 229
+    ? Math.sin((timeSeconds - 228) * Math.PI)
     : 0;
 
   const intertitle = useMemo(() => {
@@ -189,6 +194,14 @@ export function TrailerCanvas({ timeSeconds }: { timeSeconds: number }) {
           <strong>IN NEW MUSIC PERFORMANCE</strong>
           <i />
           <small>A PERFORMANCE BY HYE-JEONG</small>
+        </div>
+      ) : null}
+
+      {timeSeconds >= 249 && timeSeconds < 253 ? (
+        <div className="trailer-thought" aria-label="소년의 생각">
+          <span>It was just a dream…</span>
+          <i />
+          <b />
         </div>
       ) : null}
 

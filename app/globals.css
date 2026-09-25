@@ -3402,7 +3402,7 @@ button {
 }
 
 .trailer-rain.is-visible {
-  opacity: 0.48;
+  opacity: 0.28;
   animation: trailer-rain-drift 1.8s linear infinite;
 }
 
@@ -3529,6 +3529,55 @@ button {
   height: 1px;
   margin: 5px auto;
   background: rgb(159 191 169 / 0.42);
+}
+
+.trailer-thought {
+  position: absolute;
+  z-index: 13;
+  top: 31%;
+  right: 16%;
+  padding: clamp(12px, 1.5vw, 22px) clamp(18px, 2.2vw, 34px);
+  border: 1px solid rgb(220 226 220 / 0.16);
+  border-radius: 999px;
+  color: rgb(238 240 236 / 0.82);
+  background: rgb(5 7 7 / 0.5);
+  box-shadow: 0 12px 44px rgb(0 0 0 / 0.24);
+  backdrop-filter: blur(8px);
+  font-family: Baskerville, "Iowan Old Style", Georgia, serif;
+  font-size: clamp(0.9rem, 1.7vw, 1.8rem);
+  font-style: italic;
+  letter-spacing: 0.025em;
+  pointer-events: none;
+  animation: trailer-thought-in 1.1s ease both;
+}
+
+.trailer-thought i,
+.trailer-thought b {
+  position: absolute;
+  display: block;
+  border: 1px solid rgb(220 226 220 / 0.13);
+  border-radius: 50%;
+  background: rgb(5 7 7 / 0.48);
+  content: "";
+}
+
+.trailer-thought i {
+  bottom: -15px;
+  left: 21%;
+  width: 10px;
+  height: 10px;
+}
+
+.trailer-thought b {
+  bottom: -27px;
+  left: 16%;
+  width: 6px;
+  height: 6px;
+}
+
+@keyframes trailer-thought-in {
+  from { opacity: 0; filter: blur(5px); transform: translateY(5px); }
+  to { opacity: 1; filter: blur(0); transform: translateY(0); }
 }
 
 .trailer-chapters {
