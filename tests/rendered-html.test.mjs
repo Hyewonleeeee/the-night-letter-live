@@ -61,7 +61,14 @@ test("server-renders the isolated November trailer and its three-paste live desk
   assert.match(liveHtml, /Paste the signal\./i);
   assert.match(liveHtml, /COPY CHAPTER/i);
   assert.match(liveHtml, /THREE PASTES · THREE CHAPTERS/i);
-  assert.match(liveHtml, /<iframe[^>]+src="\/trailer"/i);
+  assert.match(liveHtml, /<iframe[^>]+src="\/trailer-stage"/i);
+
+  const stageResponse = await render("/trailer-stage");
+  assert.equal(stageResponse.status, 200);
+  const stageHtml = await stageResponse.text();
+  assert.match(stageHtml, /trailer-player[^\"]*is-stage/i);
+  assert.doesNotMatch(stageHtml, /trailer-chapters/i);
+  assert.doesNotMatch(stageHtml, /trailer-controls/i);
 
   await Promise.all([
     "chapter-1-finger-triangle.png",

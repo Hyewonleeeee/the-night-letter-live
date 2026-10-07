@@ -135,7 +135,7 @@ export function TrailerCanvas({ timeSeconds }: { timeSeconds: number }) {
     : 0;
 
   const intertitle = useMemo(() => {
-    if (timeSeconds < 8) return { kicker: "HYE-JEONG / NOVEMBER CUT", title: "BLACK MAGIC", index: "△ 001" };
+    if (timeSeconds < 8) return { kicker: "LEE / NOVEMBER CUT", title: "BLACK MAGIC", index: "△ 001" };
     if (timeSeconds >= 70 && timeSeconds < 74) return { kicker: "CHAPTER II", title: "THE FIRST SIGN", index: "△ 002" };
     if (timeSeconds >= 155 && timeSeconds < 163) return { kicker: "CHAPTER III", title: "THE RETURN", index: "△ 003" };
     return null;
@@ -193,7 +193,7 @@ export function TrailerCanvas({ timeSeconds }: { timeSeconds: number }) {
           <span>TO BE CONTINUED</span>
           <strong>IN NEW MUSIC PERFORMANCE</strong>
           <i />
-          <small>A PERFORMANCE BY HYE-JEONG</small>
+          <small>A PERFORMANCE BY LEE</small>
         </div>
       ) : null}
 

@@ -236,14 +236,14 @@ export function TrailerLiveConsole() {
           }}>{fullscreen ? "EXIT DESK" : "FULL DESK"}</button>
         </header>
         <div className="trailer-live-frame">
-          <iframe src="/trailer" title="Black Magic November preview player" allow="autoplay; fullscreen" allowFullScreen />
+          <iframe src="/trailer-stage" title="Black Magic November preview player" allow="autoplay; fullscreen" allowFullScreen />
         </div>
         <footer><span>THREE PASTES · THREE CHAPTERS</span><span>04:50 / NEW MUSIC PERFORMANCE</span></footer>
       </section>
 
       <section className="trailer-live-code" aria-label="예고편 라이브 코드">
         <header className="trailer-code-header">
-          <div><p>HYE-JEONG / LIVE VISUAL SCORE</p><h1>Paste the signal.</h1></div>
+          <div><p>LEE / LIVE VISUAL SCORE</p><h1>Paste the signal.</h1></div>
           <span><i /> AUTO TYPE</span>
         </header>
 

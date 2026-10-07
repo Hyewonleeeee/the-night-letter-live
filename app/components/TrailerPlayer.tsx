@@ -24,7 +24,11 @@ type ActiveChapter = {
   phase: "running" | "paused" | "complete";
 };
 
-export function TrailerPlayer() {
+type TrailerPlayerProps = {
+  stageMode?: boolean;
+};
+
+export function TrailerPlayer({ stageMode = false }: TrailerPlayerProps) {
   const shellRef = useRef<HTMLElement>(null);
   const frameRef = useRef<number | null>(null);
   const currentTimeRef = useRef(0);
@@ -35,16 +39,17 @@ export function TrailerPlayer() {
   const controlsTimerRef = useRef<number | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [controlsVisible, setControlsVisible] = useState(true);
+  const [controlsVisible, setControlsVisible] = useState(!stageMode);
   const [fullscreen, setFullscreen] = useState(false);
 
   const showControls = useCallback(() => {
+    if (stageMode) return;
     setControlsVisible(true);
     if (controlsTimerRef.current !== null) window.clearTimeout(controlsTimerRef.current);
     controlsTimerRef.current = window.setTimeout(() => {
       if (currentTimeRef.current > 0) setControlsVisible(false);
     }, 2_400);
-  }, []);
+  }, [stageMode]);
 
   const postStatus = useCallback((active: ActiveChapter, phase: ActiveChapter["phase"], absoluteTime: number) => {
     const elapsedSeconds = phase === "complete"
@@ -129,14 +134,14 @@ export function TrailerPlayer() {
         setCurrentTime(hold);
         active.phase = "complete";
         setPlaying(false);
-        setControlsVisible(true);
+        if (!stageMode) setControlsVisible(true);
         postStatus(active, "complete", active.endSeconds);
         frameRef.current = null;
         return;
       }
       if (next >= TRAILER_DURATION_SECONDS) {
         setPlaying(false);
-        setControlsVisible(true);
+        if (!stageMode) setControlsVisible(true);
         frameRef.current = null;
         return;
       }
@@ -147,7 +152,7 @@ export function TrailerPlayer() {
       if (frameRef.current !== null) window.cancelAnimationFrame(frameRef.current);
       frameRef.current = null;
     };
-  }, [playing, postStatus]);
+  }, [playing, postStatus, stageMode]);
 
   useEffect(() => {
     if (!("BroadcastChannel" in window)) return;
@@ -212,14 +217,14 @@ export function TrailerPlayer() {
   return (
     <main
       ref={shellRef}
-      className={`trailer-player ${controlsVisible ? "has-controls" : ""}`}
-      onMouseMove={showControls}
-      onClick={showControls}
-      onDoubleClick={() => shellRef.current?.requestFullscreen?.().catch(() => {})}
+      className={`trailer-player ${controlsVisible ? "has-controls" : ""} ${stageMode ? "is-stage" : ""}`}
+      onMouseMove={stageMode ? undefined : showControls}
+      onClick={stageMode ? undefined : showControls}
+      onDoubleClick={stageMode ? undefined : () => shellRef.current?.requestFullscreen?.().catch(() => {})}
     >
       <TrailerCanvas timeSeconds={currentTime} />
 
-      <nav className="trailer-chapters" aria-label="예고편 챕터">
+      {!stageMode ? <nav className="trailer-chapters" aria-label="예고편 챕터">
         {Object.values(TRAILER_CHAPTERS).map((chapter, index) => (
           <button key={chapter.id} type="button" onClick={(event) => {
             event.stopPropagation();
@@ -231,9 +236,9 @@ export function TrailerPlayer() {
             <time>{formatTime(chapter.startSeconds)}</time>
           </button>
         ))}
-      </nav>
+      </nav> : null}
 
-      <section className="trailer-controls" aria-label="예고편 재생 컨트롤" onClick={(event) => event.stopPropagation()}>
+      {!stageMode ? <section className="trailer-controls" aria-label="예고편 재생 컨트롤" onClick={(event) => event.stopPropagation()}>
         <div className="trailer-control-row">
           <button type="button" aria-label={playing ? "일시정지" : "재생"} onClick={playing ? pause : play}>{playing ? "Ⅱ" : "▶"}</button>
           <button type="button" aria-label="정지" onClick={stop}>■</button>
@@ -256,7 +261,7 @@ export function TrailerPlayer() {
           value={currentTime}
           onChange={(event) => seekTo(Number(event.target.value))}
         />
-      </section>
+      </section> : null}
     </main>
   );
 }

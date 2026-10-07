@@ -15,6 +15,7 @@
 
 - `http://localhost:3000/trailer`: 4분 50초 예고편 단독 플레이어
 - `http://localhost:3000/live-trailer`: 왼쪽 영상 + 오른쪽 라이브 코딩 공연 화면
+- `http://localhost:3000/trailer-stage`: 라이브 코딩 화면 내부에서 사용하는 컨트롤 없는 영상 출력
 - `https://hyewonleeeee.github.io/the-night-letter-live/`: 관람용 무음 예고편 공개 링크
 - `app/config/trailerConfig.ts`: 예고편 길이, 세 챕터, 숏, 공연용 코드
 - `app/components/TrailerCanvas.tsx`: 영상 레이어와 인트로·아웃트로 신호 그래픽
@@ -28,7 +29,8 @@
 붙여넣는 즉시 해당 영상과 코드 타임라인이 시작됩니다. 코드는 한꺼번에 표시되지
 않고 장면의 실제 시간에 맞춰 오른쪽 편집기에 천천히 완성됩니다. 일시정지와
 재생 위치 이동도 코드 타이핑에 동기화되며, 챕터 끝에서는 영상과 코드가 함께
-멈춥니다.
+멈춥니다. 공연용 `/live-trailer`의 왼쪽 영상에는 챕터 바, 시간 표시, 재생바가
+나타나지 않으므로 코드를 붙여넣을 때 영상 위로 조작 UI가 내려오지 않습니다.
 
 11월 예고편은 완전한 **무음 버전**입니다. 오디오 레이어, 음소거 버튼, 볼륨
 컨트롤을 모두 제거했으며 공연 음악과 음향은 외부 연주 시스템에서 담당합니다.
@@ -45,7 +47,7 @@
 인트로와 챕터 전환에는 삼각형 선, 스캔라인, 데이터 점을 절제한
 TouchDesigner 계열의 신호 그래픽을 사용합니다. 삼각형 신호는 일반 영상 위에
 계속 남지 않고 전환 구간에서만 나타납니다. 마지막 크레딧은
-`TO BE CONTINUED / IN NEW MUSIC PERFORMANCE / A PERFORMANCE BY HYE-JEONG`입니다.
+`TO BE CONTINUED / IN NEW MUSIC PERFORMANCE / A PERFORMANCE BY LEE`입니다.
 무대 재생 중 마우스를 움직이지 않으면 플레이어 컨트롤은 2.4초 뒤 자동으로
 사라집니다.
 
